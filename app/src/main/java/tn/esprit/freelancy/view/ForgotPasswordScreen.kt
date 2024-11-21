@@ -18,18 +18,28 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
+import tn.esprit.freelancy.session.PreferenceManager
+import tn.esprit.freelancy.session.SessionManager
+import tn.esprit.freelancy.viewModel.LoginViewModel
 import tn.esprit.freelancy.viewModel.ForgotPasswordViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ForgotPasswordScreen(viewModel: ForgotPasswordViewModel) {
     val currentStep by viewModel.currentStep.collectAsState()
+    val navController = rememberNavController()
+    val preferenceManager = SessionManager(LocalContext.current)
 
     when (currentStep) {
         1 -> ForgotPasswordStep(viewModel)
         2 -> VerifyOtpStep(viewModel)
         3 -> ResetPasswordStep(viewModel)
+        4 -> LoginScreen(navController,preferenceManager )
+
+
 
     }
 

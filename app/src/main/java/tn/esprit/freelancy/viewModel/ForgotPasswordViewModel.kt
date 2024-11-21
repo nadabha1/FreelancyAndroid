@@ -16,8 +16,8 @@ class ForgotPasswordViewModel : ViewModel() {
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
 
-    private val _otp = MutableStateFlow("")
-    val otp: StateFlow<String> = _otp
+    private val _otp3 = MutableStateFlow("")
+    val otp3: StateFlow<String> = _otp3
 
     private val _newPassword = MutableStateFlow("")
     val newPassword: StateFlow<String> = _newPassword
@@ -36,12 +36,25 @@ class ForgotPasswordViewModel : ViewModel() {
     }
 
     fun onOtpChange(newOtp: String) {
-        _otp.value = newOtp
+        _otp3.value = newOtp
     }
 
     fun onNewPasswordChange(newPassword: String) {
         _newPassword.value = newPassword
     }
+    private val _otpDigits = MutableStateFlow(List(6) { "" }) // A list for 6 OTP fields
+    val otpDigits: StateFlow<List<String>> = _otpDigits
+
+    // Combine all digits into a single string
+    val otp: String
+        get() = _otpDigits.value.joinToString("")
+
+    fun updateOtpDigit(index: Int, digit: String) {
+        val newOtpDigits = _otpDigits.value.toMutableList()
+        newOtpDigits[index] = digit.take(1) // Ensure only 1 character is stored
+        _otpDigits.value = newOtpDigits
+    }
+
 
     fun sendOtp() {
         viewModelScope.launch {
@@ -65,29 +78,38 @@ class ForgotPasswordViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.authService.resetPassword(
-                    ResetPasswordRequest(username.value, otp.value, newPassword.value)
+                    ResetPasswordRequest(username.value, otp, newPassword.value) // Use concatenated OTP
                 )
-                println(response.body()?.otp)
                 if (response.isSuccessful) {
                     _successMessage.value = "Password reset successfully."
-                    _currentStep.value = 4 // Retour à l'étape initiale
+                    _currentStep.value = 4 // Go to the success page
+                    _errorMessage.value = null // Clear errors
                 } else {
                     _errorMessage.value = response.message()
+                    _successMessage.value = null // Clear success
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Error: ${e.message}"
+                _successMessage.value = null // Clear success
             }
         }
     }
+
     fun verifyOtp() {
         viewModelScope.launch {
-            if (_otp.value == _otpFromServer.value) {
+            val enteredOtp = otp // Concatenate the user-entered digits
+            val serverOtp = _otpFromServer.value?.trim() // Trim spaces or formatting issues
+
+            if (enteredOtp == serverOtp) {
                 _successMessage.value = "OTP verified successfully."
-                _currentStep.value = 3 // Passer à l'étape suivante (nouveau mot de passe)
+                _errorMessage.value = null // Clear error message
+                _currentStep.value = 3 // Proceed to the next step
             } else {
                 _errorMessage.value = "Invalid OTP. Please try again."
+                _successMessage.value = null // Clear success message
             }
         }
     }
+
 
 }

@@ -4,10 +4,10 @@ import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
-import retrofit2.http.Field
-import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 import tn.esprit.freelancy.model.ApiResponse
@@ -18,9 +18,9 @@ import tn.esprit.freelancy.model.LoginRequest
 import tn.esprit.freelancy.model.LoginResponse
 import tn.esprit.freelancy.model.Otp
 import tn.esprit.freelancy.model.ResetPasswordRequest
+import tn.esprit.freelancy.model.SignupData
 import tn.esprit.freelancy.model.SignupRequest
 import tn.esprit.freelancy.model.SignupResponse
-import tn.esprit.freelancy.model.UpdateProfileRequest
 import tn.esprit.freelancy.model.User
 import tn.esprit.freelancy.model.UserProfile
 import tn.esprit.freelancy.model.UserProfile1
@@ -50,4 +50,5 @@ interface UserAPI {
 
     @POST("user/reset-password")
     suspend fun resetPassword(@Body request: ResetPasswordRequest): Response<ApiResponse>
+
 }

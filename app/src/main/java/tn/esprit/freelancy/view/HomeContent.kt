@@ -23,6 +23,7 @@ import tn.esprit.freelancy.viewModel.HomeViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(navController: NavHostController, username: String, viewModel: HomeViewModel) {
+println(username)
     Scaffold(
         bottomBar = {
             BottomNavigationBar(navController, username)

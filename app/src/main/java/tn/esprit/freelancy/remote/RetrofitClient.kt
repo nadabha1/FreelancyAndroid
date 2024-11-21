@@ -8,8 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import tn.esprit.freelancy.model.ApiError
 
 object RetrofitClient {
-    private const val BASE_URL = "http://172.16.8.43:3000/" // Replace with your backend URL
-   // private const val BASE_URL = "http://192.168.0.136:3000/" // Replace with your backend URL
+private const val BASE_URL = "http://192.168.1.117:3000/" // Replace with your backend URL
 
     val authService: UserAPI by lazy {
         Retrofit.Builder()

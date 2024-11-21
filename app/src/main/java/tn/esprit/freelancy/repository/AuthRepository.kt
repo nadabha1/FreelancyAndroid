@@ -1,6 +1,7 @@
 package tn.esprit.freelancy.repository
 
 import retrofit2.Response
+import tn.esprit.freelancy.model.SignupData
 import tn.esprit.freelancy.model.SignupRequest
 import tn.esprit.freelancy.model.SignupResponse
 import tn.esprit.freelancy.model.User
@@ -20,17 +21,17 @@ class AuthRepository(private val api: UserAPI) {
         return api.fetchUser(email)
     }
 
-
-
     suspend fun updateUserProfile(updatedProfile: UserProfile1):UserProfile{
         return api.updateUserProfile(updatedProfile)
     }
-    suspend fun signup(username: String, email: String, password: String): SignupResponse {
-        val response = authService.signup(SignupRequest(username, email, password))
+    suspend fun signup(username: String, email: String,role: String, password: String): SignupResponse {
+        val response = authService.signup(SignupRequest(username, email,role, password))
         if (!response.isSuccessful) {
             throw Exception("Signup failed: ${response.errorBody()?.string()}")
         }
         return response.body() ?: throw Exception("Empty response from server")
     }
+
+
 
 }

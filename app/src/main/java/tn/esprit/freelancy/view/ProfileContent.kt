@@ -1,4 +1,5 @@
 package tn.esprit.freelancy.view
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -33,15 +34,13 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import tn.esprit.freelancy.R
 import tn.esprit.freelancy.viewModel.HomeViewModel
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun ProfileContent(navController: NavHostController, email: String, viewModel: HomeViewModel) {
     val userProfile = viewModel.userProfile.collectAsState()
     val errorMessage = viewModel.errorMessage.collectAsState()
-
-    // État pour afficher ou cacher la popup de confirmation
     var showDeleteConfirmation by remember { mutableStateOf(false) }
 
-    // Fetch user profile on screen load
     LaunchedEffect(Unit) {
         viewModel.fetchUser(email)
     }
@@ -67,59 +66,91 @@ fun ProfileContent(navController: NavHostController, email: String, viewModel: H
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            userProfile.value?.avatarUrl?.let {
-                Image(
-                    painter = rememberAsyncImagePainter(it),
-                    contentDescription = "Avatar",
-                    modifier = Modifier.size(120.dp).clip(CircleShape)
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = userProfile.value?.username ?: "No Name",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            MenuOption(iconId = Icons.Default.Edit, text = "Edit Profile") {
-                userProfile.value?.let {
-                    navController.navigate("edit_profile/${email}")
-                } ?: run {
-                    println("Error: User profile is null.")
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    userProfile.value?.avatarUrl?.let {
+                        Image(
+                            painter = rememberAsyncImagePainter(it),
+                            contentDescription = "Avatar",
+                            modifier = Modifier
+                                .size(120.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = userProfile.value?.username ?: "No Name",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = email,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                    )
                 }
             }
 
-            MenuOption(iconId = Icons.Default.Lock, text = "Change Password") { /* Navigate to Change Password */ }
-            MenuOption(iconId = Icons.Default.Info, text = "Information") { /* Navigate to Information */ }
-            MenuOption(iconId = Icons.Default.Build, text = "Update") { /* Navigate to Update */ }
-            MenuOption(iconId = Icons.Default.ExitToApp, text = "Log out") { /* Perform Log out */ }
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Bouton pour supprimer le compte
+            // Menu Options
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    MenuOption(iconId = Icons.Default.Edit, text = "Edit Profile") {
+                        navController.navigate("edit_profile/${email}")
+                    }
+                    MenuOption(iconId = Icons.Default.Lock, text = "Change Password") { /* Navigate */ }
+                    MenuOption(iconId = Icons.Default.Info, text = "Information") { /* Navigate */ }
+                    MenuOption(iconId = Icons.Default.Build, text = "Update") { /* Navigate */ }
+                    MenuOption(iconId = Icons.Default.ExitToApp, text = "Log out") {
+                        navController.navigate("login") {
+                            popUpTo("profile") { inclusive = true }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Delete Account Button
             Button(
                 onClick = { showDeleteConfirmation = true },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             ) {
-                Text("Delete Account")
+                Text("Delete Account", color = Color.White)
             }
 
-            // Popup de confirmation
+            // Confirmation Dialog
             if (showDeleteConfirmation) {
                 AlertDialog(
                     onDismissRequest = { showDeleteConfirmation = false },
                     confirmButton = {
                         TextButton(onClick = {
                             userProfile.value?.let {
-                                viewModel.deleteAccount(it.idUser) // Appel à la fonction de suppression
+                                viewModel.deleteAccount(it.idUser)
                                 showDeleteConfirmation = false
                                 navController.navigate("login") {
-                                    popUpTo("profile") { inclusive = true } // Supprime la pile d'écrans jusqu'à la page de profil
-                                }                            }
+                                    popUpTo("profile") { inclusive = true }
+                                }
+                            }
                         }) {
                             Text("Confirm", color = Color.Red)
                         }
@@ -133,8 +164,6 @@ fun ProfileContent(navController: NavHostController, email: String, viewModel: H
                     text = { Text("Are you sure you want to delete your account? This action cannot be undone.") }
                 )
             }
-
-
         }
     }
 }
@@ -160,3 +189,10 @@ fun MenuOption(iconId: ImageVector, text: String, onClick: () -> Unit) {
 
 }
 
+
+@Preview(showBackground = true, widthDp = 330, heightDp = 640, apiLevel = 30)
+@Composable
+fun ProfileScreenPreview() {
+    val navController = rememberNavController()
+    ProfileContent(navController,"nada&&&", viewModel())
+}
