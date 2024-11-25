@@ -34,11 +34,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.runtime.State // Import manquant
+import tn.esprit.freelancy.remote.UserAPI
 
 class SignupViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
     private val _username = MutableStateFlow("")
     val username: StateFlow<String> = _username
+
+
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email
 
@@ -46,7 +49,8 @@ class SignupViewModel(private val authRepository: AuthRepository) : ViewModel() 
     val password: StateFlow<String> = _password
     private val _password2 = MutableStateFlow("")
     val password2: StateFlow<String> = _password2
-
+    private val _updatedSuccess = MutableStateFlow(false)
+    val updatedSuccess: StateFlow<Boolean> = _updatedSuccess
 
     private val _signupSuccess = MutableStateFlow(false)
     val signupSuccess: StateFlow<Boolean> = _signupSuccess
@@ -78,7 +82,6 @@ class SignupViewModel(private val authRepository: AuthRepository) : ViewModel() 
         viewModelScope.launch {
             try {
                 val response = authRepository.signup(username, email, "Freelancer",password)
-                // Vous pouvez stocker l'utilisateur ou son ID ici si nécessaire
                 println("Signup successful: $response")
                 _signupSuccess.value = true
             } catch (e: Exception) {
@@ -91,6 +94,28 @@ class SignupViewModel(private val authRepository: AuthRepository) : ViewModel() 
     fun onErrorMessage(s: String) {
         _errorMessage.value = s
     }
+
+    fun updateUserRole(role: String, userId: String) {
+        viewModelScope.launch {
+            try {
+                println("Updating role for user with userId: $userId")
+                println("Updating role for user with role: $role")
+                val response = authRepository.updateRole(role, userId)
+                if (response.isSuccessful) {
+                    _updatedSuccess.value = true
+                    println("Role updated successfully")
+                } else {
+                    _updatedSuccess.value = false
+                    println("Failed to update role: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                _updatedSuccess.value = false
+                println("Error while updating role: ${e.message}")
+            }
+        }
+    }
+
+
 
 }
 

@@ -41,7 +41,7 @@ class LoginViewModel(
             _isLoading.value = true
             try {
                 val response = RetrofitClient.authService.login2(LoginRequest(_email.value, _password.value))
-println(response.access_token)
+                 println(response.access_token)
                 if (response.access_token.isNotEmpty()) {
                     _loginSuccess.value = true
                     _errorMessage.value = null

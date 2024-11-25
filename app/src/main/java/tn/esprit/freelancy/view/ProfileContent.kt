@@ -29,170 +29,144 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import tn.esprit.freelancy.R
+import tn.esprit.freelancy.model.User
 import tn.esprit.freelancy.viewModel.HomeViewModel
-@SuppressLint("SuspiciousIndentation")
 @Composable
-fun ProfileContent(navController: NavHostController, email: String, viewModel: HomeViewModel) {
-    val userProfile = viewModel.userProfile.collectAsState()
-    val errorMessage = viewModel.errorMessage.collectAsState()
-    var showDeleteConfirmation by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        viewModel.fetchUser(email)
-    }
-
-    if (errorMessage.value != null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = errorMessage.value!!, color = MaterialTheme.colorScheme.error)
-        }
-    } else if (userProfile.value == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    } else {
+fun ProfileScreen(navController: NavController, user: UserP) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF6F6F6))
+            .padding(16.dp)
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Toolbar with Back Button
+            TopAppBar(
+                title = { Text("Profile", color = Color.White) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color(0xFF1E88E5))
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Profile Image Section
+            Image(
+                painter = rememberAsyncImagePainter(model = user.avatarUrl ?: R.drawable.profile_placeholder),
+                contentDescription = "Profile Picture",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(60.dp))
+                    .background(Color.Gray)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // User Details Section
+            Text(
+                text = user.username ?: "No username",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1E88E5)
+            )
+
+            Text(
+                text = user.email,
+                fontSize = 16.sp,
+                color = Color.Gray
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Details Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    .padding(8.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(4.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    userProfile.value?.avatarUrl?.let {
-                        Image(
-                            painter = rememberAsyncImagePainter(it),
-                            contentDescription = "Avatar",
-                            modifier = Modifier
-                                .size(120.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = userProfile.value?.username ?: "No Name",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = email,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
-                    )
+                    ProfileDetailRow(icon = Icons.Default.Person, label = "Date of Birth", value = user.dateOfBirth ?: "Not provided")
+                    ProfileDetailRow(icon = Icons.Default.Home, label = "Country", value = user.country ?: "Not provided")
+                    ProfileDetailRow(icon = Icons.Default.Settings, label = "Role", value = user.role?.name ?: "No role assigned")
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Menu Options
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            // Log out and Delete Account Buttons
+            Button(
+                onClick = { /* Handle log out */ },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5)),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    MenuOption(iconId = Icons.Default.Edit, text = "Edit Profile") {
-                        navController.navigate("edit_profile/${email}")
-                    }
-                    MenuOption(iconId = Icons.Default.Lock, text = "Change Password") { /* Navigate */ }
-                    MenuOption(iconId = Icons.Default.Info, text = "Information") { /* Navigate */ }
-                    MenuOption(iconId = Icons.Default.Build, text = "Update") { /* Navigate */ }
-                    MenuOption(iconId = Icons.Default.ExitToApp, text = "Log out") {
-                        navController.navigate("login") {
-                            popUpTo("profile") { inclusive = true }
-                        }
-                    }
-                }
+                Text("Log Out", color = Color.White)
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Delete Account Button
             Button(
-                onClick = { showDeleteConfirmation = true },
+                onClick = { /* Handle account deletion */ },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Delete Account", color = Color.White)
-            }
-
-            // Confirmation Dialog
-            if (showDeleteConfirmation) {
-                AlertDialog(
-                    onDismissRequest = { showDeleteConfirmation = false },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            userProfile.value?.let {
-                                viewModel.deleteAccount(it.idUser)
-                                showDeleteConfirmation = false
-                                navController.navigate("login") {
-                                    popUpTo("profile") { inclusive = true }
-                                }
-                            }
-                        }) {
-                            Text("Confirm", color = Color.Red)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDeleteConfirmation = false }) {
-                            Text("Cancel")
-                        }
-                    },
-                    title = { Text("Delete Account") },
-                    text = { Text("Are you sure you want to delete your account? This action cannot be undone.") }
-                )
             }
         }
     }
 }
 
 @Composable
-fun MenuOption(iconId: ImageVector, text: String, onClick: () -> Unit) {
+fun ProfileDetailRow(icon: ImageVector, label: String, value: String) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable { onClick() },
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Icon(
-            imageVector = iconId,
-            contentDescription = text,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(16.dp))
-        Text(text = text, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color(0xFF1E88E5),
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = label, fontSize = 16.sp, color = Color.Gray)
+        }
+        Text(text = value, fontSize = 16.sp, color = Color.Black, fontWeight = FontWeight.Bold)
     }
-
 }
 
-
-@Preview(showBackground = true, widthDp = 330, heightDp = 640, apiLevel = 30)
+@Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    val navController = rememberNavController()
-    ProfileContent(navController,"nada&&&", viewModel())
+    val dummyUser = User(
+        username = "nada",
+        email = "nada@example.com",
+        avatarUrl = null, // Replace with valid URL for testing
+        dateOfBirth = "1990-01-01",
+        country = "Tunisia",
+        role = Role(name = "Freelancer")
+    )
+    ProfileScreen(navController = rememberNavController(), user = dummyUser)
 }

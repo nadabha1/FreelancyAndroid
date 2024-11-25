@@ -32,7 +32,6 @@ import tn.esprit.freelancy.viewModel.SignupViewModelFactory
 @Composable
 fun SignupScreen(
     navController: NavHostController,
-    onSignupSuccess: () -> Unit
 ) {
     val authRepository = AuthRepository(RetrofitClient.authService)
     val viewModel: SignupViewModel = viewModel(factory = SignupViewModelFactory(authRepository))
@@ -206,7 +205,9 @@ fun SignupScreen(
     // Navigate to Next Page on Success
     if (signupSuccess.value) {
         LaunchedEffect(Unit) {
-            onSignupSuccess()
+            navController.navigate("role_selection/${username.value}") {
+                popUpTo("Signup") { inclusive = true }
+            }
         }
     }
 }
@@ -217,8 +218,6 @@ fun SignupScreenPreview() {
     val navController = rememberNavController()
     SignupScreen(
         navController = navController,
-        onSignupSuccess = {
-            println("Signup succeeded!")
-        }
+
     )
 }

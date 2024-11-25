@@ -28,17 +28,22 @@ import tn.esprit.freelancy.repository.AuthRepository
 import tn.esprit.freelancy.session.PreferenceManager
 import tn.esprit.freelancy.session.SessionManager
 import tn.esprit.freelancy.ui.theme.JetpackComposeAuthUITheme
+import tn.esprit.freelancy.view.CreateProfileScreen
+import tn.esprit.freelancy.view.CvAnalysisScreen
 import tn.esprit.freelancy.view.EditProfileScreen
 import tn.esprit.freelancy.view.ForgotPasswordScreen
+import tn.esprit.freelancy.view.Home
 import tn.esprit.freelancy.view.HomeContent
 import tn.esprit.freelancy.view.LoginScreen
 import tn.esprit.freelancy.view.ProfileContent
+import tn.esprit.freelancy.view.RoleSelectionScreen
 import tn.esprit.freelancy.view.SignupScreen
 import tn.esprit.freelancy.view.SplashScreen
 import tn.esprit.freelancy.viewModel.ForgotPasswordViewModel
 import tn.esprit.freelancy.viewModel.LoginViewModel
 import tn.esprit.freelancy.viewModel.LoginViewModelFactory
 import tn.esprit.freelancy.viewModel.SignupViewModel
+import tn.esprit.freelancy.viewModel.SignupViewModelFactory
 
 class MainActivity : ComponentActivity() {
     private val dataStore by preferencesDataStore(name = "user_preferences")
@@ -73,14 +78,33 @@ fun NavigationView(preferenceManager: PreferenceManager) {
             val email = backStackEntry.arguments?.getString("email") ?: ""
             HomeContent(navController, email, viewModel())
         }
+        composable("homeC/{email}") { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
+            Home(navController, email, viewModel())
+        }
+        composable("role_selection/{username}") { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            val authRepository = AuthRepository(RetrofitClient.authService) // Create the repository
+            val signupViewModel: SignupViewModel = viewModel(
+                factory = SignupViewModelFactory(authRepository)
+            )
+            RoleSelectionScreen(navController = navController, onRoleSelected = { role ->
+                signupViewModel.updateUserRole(role, username) // Update user role via ViewModel
+                navController.navigate("update_profile/$username") }, username = username)
+        }
+
+        composable("update_profile/{username}") {backStackEntry ->
+            val email = backStackEntry.arguments?.getString("username") ?: ""
+
+            CreateProfileScreen(navController = navController, username = email)
+
+
+        }
+
         composable("signup") {
             SignupScreen(
                 navController = navController,
-                onSignupSuccess = {
-                    navController.navigate("login") {
-                        popUpTo("signup") { inclusive = true }
-                    }
-                }
+
             )
         }
         composable("profile/{email}") { backStackEntry ->
@@ -99,6 +123,9 @@ fun NavigationView(preferenceManager: PreferenceManager) {
         composable("forgot_password") {
             val viewModel: ForgotPasswordViewModel = viewModel()
             ForgotPasswordScreen(viewModel)
+        }
+        composable("cv_analysis") {
+            CvAnalysisScreen(onBack = { navController.popBackStack() })
         }
     }
 }

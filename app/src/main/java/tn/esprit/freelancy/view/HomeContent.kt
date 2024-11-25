@@ -60,5 +60,11 @@ fun BottomNavigationBar(navController: NavHostController, email: String) {
             icon = { Icon(Icons.Default.Person, contentDescription = "Profile") },
             label = { Text("Profile") }
         )
+        NavigationBarItem(
+            selected = currentDestination == "cv_analysis",
+            onClick = { navController.navigate("cv_analysis") },
+            icon = { Icon(Icons.Default.Person, contentDescription = "Analyze CV") },
+            label = { Text("Analyze CV") }
+        )
     }
 }

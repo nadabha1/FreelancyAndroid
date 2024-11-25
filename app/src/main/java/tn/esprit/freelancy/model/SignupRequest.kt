@@ -6,7 +6,7 @@ data class SignupRequest(
     val username: String,
     val email: String,
     val password: String,
-    val role: String,
+    val role: String="Freelancer",
     val avatarUrl: String? = "dfghjkl"
 )
 

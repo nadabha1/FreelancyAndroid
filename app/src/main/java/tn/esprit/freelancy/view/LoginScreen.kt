@@ -203,7 +203,7 @@ fun LoginScreen(navController: NavHostController,
         // Handle login success
         if (loginSuccess) {
             LaunchedEffect(Unit) {
-                navController.navigate("home/$email") {
+                navController.navigate("homeC/$email") {
                     popUpTo("login") { inclusive = true }
                 }
             }

@@ -6,16 +6,17 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import tn.esprit.freelancy.model.UserProfile
 import tn.esprit.freelancy.model.GetUserIdRequest
-import tn.esprit.freelancy.model.GetUserIdResponse
+import tn.esprit.freelancy.model.GetUserResponse
+import tn.esprit.freelancy.model.GetUserResponsetest
 import tn.esprit.freelancy.remote.RetrofitClient
 
 class HomeViewModel : ViewModel() {
 
-    private val _userProfile = MutableStateFlow<UserProfile?>(null)
-    val userProfile: StateFlow<UserProfile?> = _userProfile
+    private val _userProfile = MutableStateFlow<GetUserResponse?>(null)
+    val userProfile: StateFlow<GetUserResponse?> = _userProfile
 
-    private val _user = MutableStateFlow<GetUserIdResponse?>(null)
-    val user: StateFlow<GetUserIdResponse?> = _user
+    private val _user = MutableStateFlow<GetUserResponsetest?>(null)
+    val user: StateFlow<GetUserResponsetest?> = _user
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
@@ -29,12 +30,13 @@ class HomeViewModel : ViewModel() {
             try {
                 val response = RetrofitClient.authService.getUserId(GetUserIdRequest(username))
                 _user.value = response
-                _userProfile.value = UserProfile(
-                    idUser = response.id,
-                    username = response.username,
-                    email = response.email,
-                    avatarUrl = "https://i.pravatar.cc/150?img=3"
-                )
+                _userProfile.value = GetUserResponse(
+                    _id = response.user.idUser,
+                    username = response.user.username,
+                    email = response.user.email,
+                    avatarUrl = "https://i.pravatar.cc/150?img=3",
+                    role = response.user.role)
+                println("l'id est : "+response.user.idUser)
                 _errorMessage.value = null
             } catch (e: Exception) {
                 _errorMessage.value = "Error: ${e.message}"

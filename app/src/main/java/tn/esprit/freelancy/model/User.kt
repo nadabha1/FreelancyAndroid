@@ -5,7 +5,9 @@ data class User(
     val password: String,
     val username: String,
     val avatarUrl: String,
-    val idUser: String
+    val idUser: String,
+    val role: String,
+    val otp: String
 )
 data class UpdateProfileRequest(
     val idUser: String,

@@ -6,9 +6,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import tn.esprit.freelancy.model.GetUserIdRequest
-import tn.esprit.freelancy.model.GetUserIdResponse
+import tn.esprit.freelancy.model.GetUserResponse
+import tn.esprit.freelancy.model.GetUserResponsetest
 import tn.esprit.freelancy.model.UserProfile
 import tn.esprit.freelancy.model.UserProfile1
+import tn.esprit.freelancy.model.UserProfileUpdateRequest
 import tn.esprit.freelancy.remote.RetrofitClient
 import tn.esprit.freelancy.repository.AuthRepository
 
@@ -26,8 +28,8 @@ class UpdateProfileViewModel(private val userRepository: AuthRepository) : ViewM
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
 
-    private val _user = MutableStateFlow<GetUserIdResponse?>(null)
-    val user: StateFlow<GetUserIdResponse?> = _user
+    private val _user = MutableStateFlow<GetUserResponsetest?>(null)
+    val user: StateFlow<GetUserResponsetest?> = _user
 
     // Fonction pour définir un message d'erreur
     fun setErrorMessage(message: String) {
@@ -40,13 +42,13 @@ class UpdateProfileViewModel(private val userRepository: AuthRepository) : ViewM
             _loading.value = true // Démarrage du chargement
             try {
                 val response = RetrofitClient.authService.getUserId(GetUserIdRequest(username))
-                if (response.id.isNotEmpty()) {
+                if (response.user.email.isNotEmpty()) {
                     // Mettre à jour les données de l'utilisateur
                     _user.value = response
                     _userProfile.value = UserProfile(
-                        idUser = response.id,
-                        username = response.username,
-                        email = response.email,
+                        idUser = response.user.idUser!!,
+                        username = response.user    .username,
+                        email = response.user.email,
                         avatarUrl = "https://i.pravatar.cc/150?img=3" // Avatar par défaut
                     )
                     _errorMessage.value = null
@@ -83,4 +85,23 @@ class UpdateProfileViewModel(private val userRepository: AuthRepository) : ViewM
             }
         }
     }
+
+    fun updateUserProfile(username: String,dateOfBirth: String, country: String, profilePictureUrl: String) {
+        viewModelScope.launch {
+            try {
+
+                val response = RetrofitClient.authService.createUserProfile(
+                    UserProfileUpdateRequest(username, dateOfBirth, country, profilePictureUrl)
+                )
+                if (response.isSuccessful) {
+                    // Handle success
+                } else {
+                    // Handle error
+                }
+            } catch (e: Exception) {
+                // Handle exception
+            }
+        }
+    }
+
 }
