@@ -10,8 +10,7 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import tn.esprit.freelancy.model.AnalysisResponse
-import tn.esprit.freelancy.model.Entity
+import tn.esprit.freelancy.model.user.Entity
 import tn.esprit.freelancy.repository.CvRepository
 
 class CvViewModel(private val repository: CvRepository) : ViewModel() {

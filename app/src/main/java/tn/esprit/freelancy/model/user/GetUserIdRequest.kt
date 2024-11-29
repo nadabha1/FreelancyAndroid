@@ -1,7 +1,4 @@
-package tn.esprit.freelancy.model
-
-import com.google.gson.annotations.SerializedName
-import retrofit2.http.Part
+package tn.esprit.freelancy.model.user
 
 data class GetUserIdRequest(
     val username: String // Nom d'utilisateur envoyé dans le corps de la requête
@@ -18,8 +15,12 @@ data class GetUserIdResponse(
     val id:String
 
 )
+data class GetRoleIdResponse(
+    val idRole:String
+
+)
 data class GetUserResponsetest(
-    val user:User
+    val user: User
 
 )
 data class ForgotPasswordRequest(
@@ -42,4 +43,8 @@ data class ResetPasswordRequest(
     val username: String,
     val otp: String ,
     val newPassword: String
+)
+data class LoginResult(
+    val success: Boolean,
+    val message: String? = null
 )

@@ -1,34 +1,31 @@
 package tn.esprit.freelancy.remote
 
-import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
-import retrofit2.http.Multipart
+import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
-import tn.esprit.freelancy.model.ApiResponse
-import tn.esprit.freelancy.model.ForgotPasswordRequest
-import tn.esprit.freelancy.model.GetUserIdRequest
-import tn.esprit.freelancy.model.GetUserIdResponse
-import tn.esprit.freelancy.model.GetUserResponse
-import tn.esprit.freelancy.model.GetUserResponsetest
-import tn.esprit.freelancy.model.LoginRequest
-import tn.esprit.freelancy.model.LoginResponse
-import tn.esprit.freelancy.model.Otp
-import tn.esprit.freelancy.model.ResetPasswordRequest
-import tn.esprit.freelancy.model.SignupData
-import tn.esprit.freelancy.model.SignupRequest
-import tn.esprit.freelancy.model.SignupResponse
-import tn.esprit.freelancy.model.UpdateRoleRequest
-import tn.esprit.freelancy.model.User
-import tn.esprit.freelancy.model.UserProfile
-import tn.esprit.freelancy.model.UserProfile1
-import tn.esprit.freelancy.model.UserProfileUpdateRequest
+import tn.esprit.freelancy.model.user.ApiResponse
+import tn.esprit.freelancy.model.user.ForgotPasswordRequest
+import tn.esprit.freelancy.model.user.GetRoleIdResponse
+import tn.esprit.freelancy.model.user.GetUserIdRequest
+import tn.esprit.freelancy.model.user.GetUserIdResponse
+import tn.esprit.freelancy.model.user.GetUserResponsetest
+import tn.esprit.freelancy.model.user.LoginRequest
+import tn.esprit.freelancy.model.user.LoginResponse
+import tn.esprit.freelancy.model.user.Otp
+import tn.esprit.freelancy.model.user.ResetPasswordRequest
+import tn.esprit.freelancy.model.user.SignupRequest
+import tn.esprit.freelancy.model.user.SignupResponse
+import tn.esprit.freelancy.model.user.UpdateRoleRequest
+import tn.esprit.freelancy.model.user.UserProfile
+import tn.esprit.freelancy.model.user.UserProfile1
+import tn.esprit.freelancy.model.user.UserProfileComplet
+import tn.esprit.freelancy.model.user.UserProfileUpdateRequest
 
 interface UserAPI {
 
@@ -41,6 +38,8 @@ interface UserAPI {
         @Body updatedProfile: UserProfile1
     ): UserProfile
 
+    @GET("user/profile") // Replace with your actual endpoint
+    suspend fun getUserProfile(@Query("email") email: String): UserProfileComplet
     @DELETE("user/{id}")
     suspend fun deleteUser(@Path("id") userId: String)
     @POST("user/getuser")
@@ -62,4 +61,6 @@ interface UserAPI {
     suspend fun createUserProfile(@Body profile: UserProfileUpdateRequest): Response<Any>
 
 
+    @POST("user/getIdRole")
+    suspend fun getRoleName(@Body request: GetUserIdResponse): GetRoleIdResponse
 }

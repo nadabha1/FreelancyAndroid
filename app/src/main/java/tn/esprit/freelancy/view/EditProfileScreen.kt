@@ -14,8 +14,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import tn.esprit.freelancy.model.UserProfile
-import tn.esprit.freelancy.model.UserProfile1
+import tn.esprit.freelancy.model.user.UserProfile1
 import tn.esprit.freelancy.repository.AuthRepository
 import tn.esprit.freelancy.viewModel.UpdateProfileViewModel
 import tn.esprit.freelancy.viewModel.UpdateProfileViewModelFactory

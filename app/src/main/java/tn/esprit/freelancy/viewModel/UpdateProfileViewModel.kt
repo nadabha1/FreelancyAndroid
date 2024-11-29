@@ -5,12 +5,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import tn.esprit.freelancy.model.GetUserIdRequest
-import tn.esprit.freelancy.model.GetUserResponse
-import tn.esprit.freelancy.model.GetUserResponsetest
-import tn.esprit.freelancy.model.UserProfile
-import tn.esprit.freelancy.model.UserProfile1
-import tn.esprit.freelancy.model.UserProfileUpdateRequest
+import tn.esprit.freelancy.model.user.GetUserIdRequest
+import tn.esprit.freelancy.model.user.GetUserResponsetest
+import tn.esprit.freelancy.model.user.UserProfile
+import tn.esprit.freelancy.model.user.UserProfile1
+import tn.esprit.freelancy.model.user.UserProfileUpdateRequest
 import tn.esprit.freelancy.remote.RetrofitClient
 import tn.esprit.freelancy.repository.AuthRepository
 
@@ -18,9 +17,6 @@ class UpdateProfileViewModel(private val userRepository: AuthRepository) : ViewM
 
     private val _userProfile = MutableStateFlow<UserProfile?>(null)
     val userProfile: StateFlow<UserProfile?> = _userProfile
-
-    private val _updateSuccess = MutableStateFlow<Boolean?>(null)
-    val updateSuccess: StateFlow<Boolean?> = _updateSuccess
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
@@ -35,7 +31,8 @@ class UpdateProfileViewModel(private val userRepository: AuthRepository) : ViewM
     fun setErrorMessage(message: String) {
         _errorMessage.value = message
     }
-
+    private val _updateSuccess = MutableStateFlow(false)
+    val updateSuccess: StateFlow<Boolean> = _updateSuccess
     // Fonction pour récupérer le profil utilisateur à partir du backend
     fun fetchUser(username: String) {
         viewModelScope.launch {
@@ -94,14 +91,23 @@ class UpdateProfileViewModel(private val userRepository: AuthRepository) : ViewM
                     UserProfileUpdateRequest(username, dateOfBirth, country, profilePictureUrl)
                 )
                 if (response.isSuccessful) {
-                    // Handle success
+                        println("user profile updated successfully")
+                    _updateSuccess.value = true
                 } else {
-                    // Handle error
+                    _updateSuccess.value = false
+                    println("user profile update failed")
+
                 }
             } catch (e: Exception) {
-                // Handle exception
+                println("user profile update failed")
+                _updateSuccess.value = false
+                e.printStackTrace()
             }
         }
+
+
     }
+
+
 
 }

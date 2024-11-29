@@ -1,4 +1,4 @@
-package tn.esprit.freelancy.model
+package tn.esprit.freelancy.model.user
 
 import retrofit2.http.Part
 

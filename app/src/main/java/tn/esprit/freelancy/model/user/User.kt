@@ -1,4 +1,4 @@
-package tn.esprit.freelancy.model
+package tn.esprit.freelancy.model.user
 
 data class User(
     val email: String,

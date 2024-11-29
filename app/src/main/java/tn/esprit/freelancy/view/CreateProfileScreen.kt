@@ -47,6 +47,8 @@ fun CreateProfileScreen(
     val viewModel: UpdateProfileViewModel = viewModel(
         factory = UpdateProfileViewModelFactory(userRepository ))
     // State to hold the selected image URI
+
+    val updateSuccess by viewModel.updateSuccess.collectAsState()
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
 
     // Launcher to pick an image
@@ -177,6 +179,13 @@ fun CreateProfileScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Create", color = Color.White)
+            }
+        }
+    }
+    if (updateSuccess) {
+        LaunchedEffect(Unit) {
+            navController.navigate("login") {
+                popUpTo("update_profile/{username}") { inclusive = true }
             }
         }
     }

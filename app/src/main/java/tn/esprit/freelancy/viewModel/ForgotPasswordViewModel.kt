@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import tn.esprit.freelancy.model.ForgotPasswordRequest
-import tn.esprit.freelancy.model.ResetPasswordRequest
+import tn.esprit.freelancy.model.user.ForgotPasswordRequest
+import tn.esprit.freelancy.model.user.ResetPasswordRequest
 import tn.esprit.freelancy.remote.RetrofitClient
 
 class ForgotPasswordViewModel : ViewModel() {

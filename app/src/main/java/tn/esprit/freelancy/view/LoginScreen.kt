@@ -14,14 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import tn.esprit.freelancy.R
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,30 +26,33 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
-import tn.esprit.freelancy.session.PreferenceManager
+import tn.esprit.freelancy.model.user.GetUserIdResponse
+import tn.esprit.freelancy.remote.RetrofitClient
 import tn.esprit.freelancy.session.SessionManager
 import tn.esprit.freelancy.viewModel.LoginViewModel
 import tn.esprit.freelancy.viewModel.LoginViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(navController: NavHostController,
-                sessionManager: SessionManager,
-               ) {
+fun LoginScreen(
+    navController: NavHostController,
+    sessionManager: SessionManager,
+) {
     val viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(sessionManager))
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val loginSuccess by viewModel.loginSuccess.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
+    val loginFre by viewModel.loginFre.collectAsState()
+    val loginEntr by viewModel.loginEntrep.collectAsState()
+
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val isLoading by viewModel.isLoading.collectAsState()
-    var showErrorDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val role by viewModel.role.collectAsState()
 
     Box(
         modifier = Modifier
@@ -170,9 +167,14 @@ fun LoginScreen(navController: NavHostController,
                             if (email.isNotEmpty() && password.isNotEmpty()) {
                                 coroutineScope.launch {
                                     viewModel.login()
+                                    val userRole = role?.idRole
+                                    println("Email in LoginScreen loginnnnnnnnnnnnnn1111111: $userRole")
+
+                                    println("Email in LoginScreen loginnnnnnnnnnnnnn: ${role?.idRole}")
+
                                 }
                             } else {
-                                showErrorDialog = true
+                                errorMessage = "Please fill in all fields"
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF283593)),
@@ -202,24 +204,35 @@ fun LoginScreen(navController: NavHostController,
 
         // Handle login success
         if (loginSuccess) {
+
             LaunchedEffect(Unit) {
-                navController.navigate("homeC/$email") {
-                    popUpTo("login") { inclusive = true }
-                }
+                    if (loginEntr) {
+                        navController.navigate("projects") {
+                            println("Email in SplashScreen: $email")
+
+                            // Clear the back stack so the user can't return to the splash screen
+                            popUpTo("splash") { inclusive = true }
+                        }
+                    }
+                    else if (loginFre) {
+                        navController.navigate("homeC/$email") {
+                            println("Email in SplashScreen: $email")
+                        }
+                    }
             }
         }
 
         // Error Dialog
-        if (showErrorDialog || errorMessage != null) {
+        errorMessage?.let { message ->
             AlertDialog(
-                onDismissRequest = { showErrorDialog = false },
+                onDismissRequest = { errorMessage = null },
                 confirmButton = {
-                    TextButton(onClick = { showErrorDialog = false }) {
+                    TextButton(onClick = { errorMessage = null }) {
                         Text("OK", color = MaterialTheme.colorScheme.primary)
                     }
                 },
                 title = { Text("Error") },
-                text = { Text(errorMessage ?: "Please fill in all fields") }
+                text = { Text(message) }
             )
         }
     }
