@@ -133,6 +133,8 @@ fun NavigationView(preferenceManager: PreferenceManager) {
             val userProfile by homeViewModel.userProfile2.collectAsState()
             val errorMessage by homeViewModel.errorMessage.collectAsState()
 
+
+            
             LaunchedEffect(email) {
                 homeViewModel.fetchUserProfile(email)
             }
