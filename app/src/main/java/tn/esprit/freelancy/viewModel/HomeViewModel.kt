@@ -1,16 +1,29 @@
 package tn.esprit.freelancy.viewModel
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import tn.esprit.freelancy.model.projet.Project
+import tn.esprit.freelancy.model.projet.Projet
 import tn.esprit.freelancy.model.user.GetRoleIdResponse
 import tn.esprit.freelancy.model.user.GetUserIdResponse
 import tn.esprit.freelancy.model.user.GetUserResponse
 import tn.esprit.freelancy.model.user.GetUserResponsetest
 import tn.esprit.freelancy.model.user.UserProfileComplet
 import tn.esprit.freelancy.remote.RetrofitClient
-class HomeViewModel : ViewModel() {
+import tn.esprit.freelancy.session.SessionManager
+
+class HomeViewModel(private val sessionManager: SessionManager)  : ViewModel() {
+
+    val _projects = MutableStateFlow<List<Projet>>(emptyList())
+    val projects: StateFlow<List<Projet>> = _projects
+    val _projectsIa = MutableStateFlow<List<Project>>(emptyList())
+    val projectsIa: StateFlow<List<Project>> = _projectsIa
+
+    val userId: String? = sessionManager.getUserId()
+
 
     private val _userProfile = MutableStateFlow<GetUserResponse?>(null)
     val userProfile: StateFlow<GetUserResponse?> = _userProfile
@@ -77,6 +90,38 @@ class HomeViewModel : ViewModel() {
                 _errorMessage.value = null
             } catch (e: Exception) {
                 _errorMessage.value = "Error: ${e.message}"
+            }
+        }
+    }
+
+    init {
+        loadProjectsIA()
+    }
+    private fun loadProjectsIA() {
+        // Fetch projects from your backend using Retrofit or another data source
+        viewModelScope.launch {
+            if (userId != null) {
+                val projectList = RetrofitClient.projetApi.getOngoingProjects(userId)
+                _projectsIa.value = projectList
+            }
+
+        }
+    }
+
+    fun fetchProjectByIa() {
+        viewModelScope.launch {
+            try {
+                if (userId != null) {
+
+                    val response = RetrofitClient.projetApi.getOngoingProjects(userId)
+                    _projectsIa.value = response
+
+                }
+                if (userId == null) {
+                    Log.e("ProjetViewModel", "User ID is null or undefined")
+                }
+            } catch (e: Exception) {
+                println("Error fetching projects: ${e.message}")
             }
         }
     }

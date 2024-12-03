@@ -29,6 +29,7 @@ fun OngoingProjectsScreen(navController: NavController, viewModel: ProjetViewMod
     var isLoading by remember { mutableStateOf(true) }
     val userId = sessionManager.getUserId()
 
+
     // Fetch projects assuming userId is available
     LaunchedEffect(Unit) {
         viewModel.fetchProjectByIa()
@@ -78,9 +79,9 @@ fun OngoingProjectsScreen(navController: NavController, viewModel: ProjetViewMod
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(projects) { project ->
                         ProjetCard(project, onClick = {
-                            navController.navigate("projectDetail/${project.id}")
-
-                        })  ;
+                            // Navigate to Project Detail Screen and pass project object
+                            navController.navigate("project_detail/${project.id}")
+                        })
 
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -89,9 +90,14 @@ fun OngoingProjectsScreen(navController: NavController, viewModel: ProjetViewMod
         }
     }
 }
-
 @Composable
 fun ProjetCard(project: Project, onClick: () -> Unit) {
+    // Convert score to percentage
+    val scorePercentage = (project.score * 100).toInt()
+
+    // Determine color based on score
+    val scoreColor = if (scorePercentage >= 50) Color.Green else Color.Red
+
     Card(
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF0056B3)),
@@ -149,6 +155,16 @@ fun ProjetCard(project: Project, onClick: () -> Unit) {
                         fontSize = 12.sp
                     )
                 }
+
+                // Show score as percentage and color it
+                Text(
+                    text = "Score: $scorePercentage%",
+                    color = scoreColor, // Color changes based on score
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }

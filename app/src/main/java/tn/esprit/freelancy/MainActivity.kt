@@ -19,6 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import tn.esprit.freelancy.remote.RetrofitClient
 import tn.esprit.freelancy.repository.AuthRepository
+import tn.esprit.freelancy.repository.NotificationRepository
 import tn.esprit.freelancy.session.PreferenceManager
 import tn.esprit.freelancy.session.SessionManager
 import tn.esprit.freelancy.ui.theme.JetpackComposeAuthUITheme
@@ -34,12 +35,17 @@ import tn.esprit.freelancy.view.RoleSelectionScreen
 import tn.esprit.freelancy.view.SignupScreen
 import tn.esprit.freelancy.view.SplashScreen
 import tn.esprit.freelancy.view.projet.AddProjectScreen
+import tn.esprit.freelancy.view.projet.EntrepreneurNotificationScreen
+import tn.esprit.freelancy.view.projet.NotificationScreen
 import tn.esprit.freelancy.view.projet.OngoingProjectsScreen
+import tn.esprit.freelancy.view.projet.ProjectDetailScreen
 import tn.esprit.freelancy.view.projet.ProjetListScreen
 import tn.esprit.freelancy.viewModel.ForgotPasswordViewModel
 import tn.esprit.freelancy.viewModel.HomeViewModel
+import tn.esprit.freelancy.viewModel.HomeViewModelFactory
 import tn.esprit.freelancy.viewModel.SignupViewModel
 import tn.esprit.freelancy.viewModel.SignupViewModelFactory
+import tn.esprit.freelancy.viewModel.projet.NotificationViewModel
 import tn.esprit.freelancy.viewModel.projet.ProjetViewModel
 import tn.esprit.freelancy.viewModel.projet.ProjetViewModelFactory
 
@@ -76,12 +82,15 @@ fun NavigationView(preferenceManager: PreferenceManager) {
         }
         composable("home/{email}") { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
+            val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(SessionManager(LocalContext.current))) // Use the factory
             HomeContent(navController, email, viewModel())
         }
         composable("homeC/{email}") { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
-            Home(navController, email, viewModel())
+            val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(SessionManager(LocalContext.current))) // Use the factory
+            Home(navController, email, homeViewModel, SessionManager(LocalContext.current))
         }
+
         composable("role_selection/{username}") { backStackEntry ->
             val username = backStackEntry.arguments?.getString("username") ?: ""
             val signupViewModel: SignupViewModel = viewModel(
@@ -99,6 +108,13 @@ fun NavigationView(preferenceManager: PreferenceManager) {
 
 
         }
+        composable("project_detail/{projectId}") { backStackEntry ->
+            val projectId = backStackEntry.arguments?.getString("projectId") ?: ""
+            val viewModel: ProjetViewModel = viewModel(
+                factory = ProjetViewModelFactory(repository)
+            )
+            ProjectDetailScreen(navController = navController, projectId = projectId, viewModel =viewModel)
+        }
 
         composable("signup") {
             SignupScreen(
@@ -106,14 +122,19 @@ fun NavigationView(preferenceManager: PreferenceManager) {
 
             )
         }
+        composable("alerts") {
+            EntrepreneurNotificationScreen(entrepreneurId = "123"
+                ,notificationViewModel = NotificationViewModel(NotificationRepository(RetrofitClient.projetApi),sessionManager = SessionManager(LocalContext.current))
+                )
+        }
         composable("profile/{email}") { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
-            val viewModel: HomeViewModel = viewModel()
-            val userProfile by viewModel.userProfile2.collectAsState()
-            val errorMessage by viewModel.errorMessage.collectAsState()
+            val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(SessionManager(LocalContext.current))) // Use the factory
+            val userProfile by homeViewModel.userProfile2.collectAsState()
+            val errorMessage by homeViewModel.errorMessage.collectAsState()
 
             LaunchedEffect(email) {
-                viewModel.fetchUserProfile(email)
+                homeViewModel.fetchUserProfile(email)
             }
 
             when {

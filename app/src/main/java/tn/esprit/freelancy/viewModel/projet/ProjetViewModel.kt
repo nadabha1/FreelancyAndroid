@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import retrofit2.HttpException
+import tn.esprit.freelancy.model.projet.ApplicationRequest
 import tn.esprit.freelancy.model.projet.Project
 import tn.esprit.freelancy.model.projet.ProjectResponse
 import tn.esprit.freelancy.model.projet.Projet
@@ -18,17 +20,15 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
     val projects: StateFlow<List<Projet>> = _projects
     val _projectsIa = MutableStateFlow<List<Project>>(emptyList())
     val projectsIa: StateFlow<List<Project>> = _projectsIa
-
-     val userId: String? = sessionManager.getUserId()
-    val userid = sessionManager.getSession()?.id
+    val _selectedProject = MutableStateFlow<Projet?>(null) // To store the selected project details
+    val selectedProject: StateFlow<Projet?> = _selectedProject
+    val userId: String? = sessionManager.getUserId()
 
     fun fetchProjects() {
         viewModelScope.launch {
             try {
                 if (userId != null) {
-                    // Call the POST method with the userId in the request body
                    val response = RetrofitClient.projetApi.getAllProjectsById(userId)
-
                 }
             } catch (e: Exception) {
                 println("Error fetching projects: ${e.message}")
@@ -39,10 +39,14 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
         viewModelScope.launch {
             try {
                 if (userId != null) {
+
                     val response = RetrofitClient.projetApi.getOngoingProjects(userId)
-                    if (response != null) {
-                        println("Fetched projects: $response")
-                        _projectsIa.value = response}}
+                    _projectsIa.value = response
+
+                }
+                if (userId == null) {
+                    Log.e("ProjetViewModel", "User ID is null or undefined")
+                }
             } catch (e: Exception) {
                 println("Error fetching projects: ${e.message}")
             }
@@ -58,6 +62,16 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
             }
         }
     }
+    fun fetchProjectById(projectId: String) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.projetApi.getProjectById(projectId) // API call to fetch project
+                _selectedProject.value = response // Store the fetched project
+            } catch (e: Exception) {
+                println("Error fetching project by ID: ${e.message}")
+            }
+        }
+    }
 
     init {
         loadProjects()
@@ -67,7 +81,6 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
         // Fetch projects from your backend using Retrofit or another data source
         viewModelScope.launch {
             if (userId != null) {
-                println("baaaaaaaaaad: $userId")
                 val projectList = RetrofitClient.projetApi.getAllProjectsById(userId)
                 _projects.value = projectList
             }
@@ -77,4 +90,45 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
             }
         }
     }
+    private fun loadProjectsIA() {
+        // Fetch projects from your backend using Retrofit or another data source
+        viewModelScope.launch {
+            if (userId != null) {
+                val projectList = RetrofitClient.projetApi.getOngoingProjects(userId)
+                _projectsIa.value = projectList
+            }
+
+        }
+    }
+
+    fun applyForProject(projectId: String) {
+        viewModelScope.launch {
+            try {
+                if (userId != null) {
+                    val applicationRequest = ApplicationRequest(freelancer = userId, project = projectId,    status = "pending"  // Make sure status is a valid string
+                    )
+
+                    // Log the request for debugging purposes
+                    println("Sending application request: $applicationRequest")
+
+                    // Send the application request using Retrofit
+                    val response = RetrofitClient.projetApi.createApplication(applicationRequest)
+
+                    // Handle success response
+                    println("Application submitted successfully: $response")
+                } else {
+                    println("User not logged in")
+                }
+            } catch (e: Exception) {
+                // Handle error and provide more details
+                if (e is HttpException) {
+                    val errorResponse = e.response()?.errorBody()?.string()
+                    println("Error applying for project: $errorResponse")
+                } else {
+                    println("Error applying for project: ${e.message}")
+                }
+            }
+        }
+    }
+
 }
