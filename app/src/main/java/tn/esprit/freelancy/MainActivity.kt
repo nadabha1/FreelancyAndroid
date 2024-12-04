@@ -124,7 +124,7 @@ fun NavigationView(preferenceManager: PreferenceManager) {
         }
         composable("alerts") {
             EntrepreneurNotificationScreen(entrepreneurId = "123"
-                ,notificationViewModel = NotificationViewModel(NotificationRepository(RetrofitClient.projetApi),sessionManager = SessionManager(LocalContext.current))
+                ,notificationViewModel = NotificationViewModel(NotificationRepository(RetrofitClient.projetApi),sessionManager = SessionManager(LocalContext.current)),navController
                 )
         }
         composable("profile/{email}") { backStackEntry ->

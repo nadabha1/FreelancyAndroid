@@ -73,7 +73,7 @@ fun OngoingProjectsScreen(navController: NavController, viewModel: ProjetViewMod
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No ongoing projects", color = Color.White)
+                    Text("loading... ", color = Color.White)
                 }
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
