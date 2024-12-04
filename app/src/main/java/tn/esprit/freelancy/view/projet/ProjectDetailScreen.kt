@@ -81,7 +81,7 @@ fun ProjectDetailScreen(navController: NavController, projectId: String, viewMod
 
                 // Button to apply for the project
                 Button(
-                    onClick = { viewModel.applyForProject(projectId) },
+                    onClick = { viewModel.applyForProject(projectId, context = navController.context ) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0056B3))
                 ) {

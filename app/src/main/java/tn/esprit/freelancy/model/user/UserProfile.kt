@@ -14,13 +14,13 @@ data class UserProfile1(
     @SerializedName("email") val email: String
 )
 data class UserProfileComplet(
-    @SerializedName("id") val idUser: String,
+    @SerializedName("_id") val idUser: String,
     @SerializedName("username") val username: String,
     @SerializedName("email") val email: String,
     @SerializedName("avatarUrl") var avatarUrl: String? = null,
     @SerializedName("dateOfBirth") val dateOfBirth: String? = null,
     @SerializedName("country") val country: String? = null,
     @SerializedName("role") val role:String? = null,
-    @SerializedName("skills") val skills: List<String>? = null
+    @SerializedName("skills") val skills: String?= null
 
 )

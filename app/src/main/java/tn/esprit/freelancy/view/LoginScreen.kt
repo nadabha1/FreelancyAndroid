@@ -167,11 +167,6 @@ fun LoginScreen(
                             if (email.isNotEmpty() && password.isNotEmpty()) {
                                 coroutineScope.launch {
                                     viewModel.login()
-                                    val userRole = role?.idRole
-                                    println("Email in LoginScreen loginnnnnnnnnnnnnn1111111: $userRole")
-
-                                    println("Email in LoginScreen loginnnnnnnnnnnnnn: ${role?.idRole}")
-
                                 }
                             } else {
                                 errorMessage = "Please fill in all fields"
@@ -204,21 +199,23 @@ fun LoginScreen(
 
         // Handle login success
         if (loginSuccess) {
-
             LaunchedEffect(Unit) {
-                    if (loginEntr) {
+                    if(loginEntr) {
                         navController.navigate("projects") {
-                            println("Email in SplashScreen: $email")
-
-                            // Clear the back stack so the user can't return to the splash screen
                             popUpTo("splash") { inclusive = true }
                         }
                     }
-                    else if (loginFre) {
+                if(loginFre) {
                         navController.navigate("homeC/$email") {
-                            println("Email in SplashScreen: $email")
+                            popUpTo("splash") { inclusive = true }
                         }
                     }
+                    else {
+                        println("role: ${role?.idRole}")
+
+                        errorMessage = "Unknown user role. Please contact support."
+                    }
+
             }
         }
 

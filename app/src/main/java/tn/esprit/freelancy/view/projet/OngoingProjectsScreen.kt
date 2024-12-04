@@ -79,7 +79,6 @@ fun OngoingProjectsScreen(navController: NavController, viewModel: ProjetViewMod
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(projects) { project ->
                         ProjetCard(project, onClick = {
-                            // Navigate to Project Detail Screen and pass project object
                             navController.navigate("project_detail/${project.id}")
                         })
 

@@ -39,6 +39,7 @@ import tn.esprit.freelancy.view.projet.EntrepreneurNotificationScreen
 import tn.esprit.freelancy.view.projet.NotificationScreen
 import tn.esprit.freelancy.view.projet.OngoingProjectsScreen
 import tn.esprit.freelancy.view.projet.ProjectDetailScreen
+import tn.esprit.freelancy.view.projet.ProjectDetailScreenForEntrepreneur
 import tn.esprit.freelancy.view.projet.ProjetListScreen
 import tn.esprit.freelancy.viewModel.ForgotPasswordViewModel
 import tn.esprit.freelancy.viewModel.HomeViewModel
@@ -115,6 +116,15 @@ fun NavigationView(preferenceManager: PreferenceManager) {
             )
             ProjectDetailScreen(navController = navController, projectId = projectId, viewModel =viewModel)
         }
+        composable("project_detailEnt/{projectId}") { backStackEntry ->
+            val projectId = backStackEntry.arguments?.getString("projectId") ?: ""
+            val viewModel: ProjetViewModel = viewModel(
+                factory = ProjetViewModelFactory(repository)
+            )
+            ProjectDetailScreenForEntrepreneur(navController = navController, projectId = projectId, viewModel =viewModel)
+
+
+        }
 
         composable("signup") {
             SignupScreen(
@@ -133,8 +143,6 @@ fun NavigationView(preferenceManager: PreferenceManager) {
             val userProfile by homeViewModel.userProfile2.collectAsState()
             val errorMessage by homeViewModel.errorMessage.collectAsState()
 
-
-            
             LaunchedEffect(email) {
                 homeViewModel.fetchUserProfile(email)
             }

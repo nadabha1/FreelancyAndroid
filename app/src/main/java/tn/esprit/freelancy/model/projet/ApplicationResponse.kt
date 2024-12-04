@@ -12,3 +12,14 @@ data class ApplicationRequest(
     val project: String ,
     val status: String
 )
+data class ApplicationStatusResponse(
+    val freelancer: String,
+    val status: String
+)
+data class ApplicationStatusRequest(
+    val freelancerId: String,
+    val projectId: String
+)
+data class ApplicationStatusResponsem(
+    val statusMap: Map<String, String> // Assurez-vous que le champ est nommé 'statusMap'
+)

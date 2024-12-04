@@ -1,12 +1,16 @@
 package tn.esprit.freelancy.remote.projet
+import retrofit2.Response
 
 import retrofit2.http.*
 import tn.esprit.freelancy.model.projet.ApplicationRequest
 import tn.esprit.freelancy.model.projet.ApplicationResponse
+import tn.esprit.freelancy.model.projet.ApplicationStatusRequest
+import tn.esprit.freelancy.model.projet.ApplicationStatusResponse
 import tn.esprit.freelancy.model.projet.Notification
 import tn.esprit.freelancy.model.projet.Project
 import tn.esprit.freelancy.model.projet.ProjectResponse
 import tn.esprit.freelancy.model.projet.Projet
+import tn.esprit.freelancy.model.user.UserProfileComplet
 
 interface ProjetAPI {
     @POST("projet/add")
@@ -46,5 +50,28 @@ interface ProjetAPI {
         @Path("notificationId") notificationId: String
     ): Notification
 
+    @GET("application/project/{projectId}")
+    suspend fun getFreelancersByProjectId(@Path("projectId") projectId: String): List<UserProfileComplet>
+    @PATCH("application/{id}/status")
+    suspend fun updateApplicationStatus(
+        @Path("id") applicationId: String,
+        @Body status: String
+    ): Response<Unit>
+
+    @POST("application/accept")
+    suspend fun acceptApplication(
+        @Query("freelancerId") freelancerId: String,
+        @Query("projectId") projectId: String
+    ): Response<Unit>
+    @POST("application/status")
+    suspend fun getApplicationStatus(
+        @Body request: ApplicationStatusRequest
+    ): ApplicationStatusResponse
+
+    @POST("application/reject")
+    suspend fun rejectApplication(
+        @Query("freelancerId") freelancerId: String,
+        @Query("projectId") projectId: String
+    ): Response<Unit>
 
 }

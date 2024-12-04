@@ -50,7 +50,6 @@ class LoginViewModel(
             try {
                 val success = sessionManager.authenticate(_email.value, _password.value)
                 if (success) {
-                    _loginSuccess.value = true
                     val responseBody = RetrofitClient.authService.getUserProfile(_email.value)
                     val id = responseBody.idUser
                     println("User ID in login : $id")
@@ -70,6 +69,9 @@ class LoginViewModel(
                         _loginEntrep.value = false
                     }
                     _errorMessage.value = null
+
+                    _loginSuccess.value = true
+
                 } else {
                     _loginSuccess.value = false
                     _errorMessage.value = "Login failed: No access token received"

@@ -101,7 +101,7 @@ fun ProjetListScreen(
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(projects) { project ->
                         ProjectCard2(project, onClick = {
-                            navController.navigate("projectDetail/${project.id}")
+                            navController.navigate("project_detailEnt/${project._id}")
                         })
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -180,7 +180,7 @@ fun ProjectCard2(project: Projet, onClick: () -> Unit) {
 fun ProjetListPreview() {
     val sampleProjects = listOf(
         Projet(
-            id = "1",
+            _id = "1",
             title = "Build a small website",
             description = "Looking for a developer to create a small Django web app.",
             technologies = "Python, Django",
@@ -191,7 +191,7 @@ fun ProjetListPreview() {
         ),
 
         Projet(
-            id = "2",
+            _id = "2",
             title = "Android App Development",
             description = "Need an Android app for managing tasks.",
             technologies = "Kotlin, Jetpack Compose",

@@ -1,7 +1,7 @@
 package tn.esprit.freelancy.model.projet
 
 data class Projet(
-    val id: String? = null,
+    val _id: String? = null,
     val title: String,
     val description: String,
     val technologies: String,

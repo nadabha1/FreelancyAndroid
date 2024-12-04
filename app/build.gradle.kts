@@ -102,7 +102,6 @@ dependencies {
 
     implementation ("androidx.compose.material3:material3:1.0.0")
     implementation ("androidx.compose.foundation:foundation:1.3.0")
-    implementation ("androidx.compose.runtime:runtime:1.3.0")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
@@ -111,6 +110,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation ("com.google.firebase:firebase-messaging:23.0.0") // For FCM
+    implementation ("androidx.compose.runtime:runtime:1.5.0") // Vérifiez la dernière version
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
 
 }
