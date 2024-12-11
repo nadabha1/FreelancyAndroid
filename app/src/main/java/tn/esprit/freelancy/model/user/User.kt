@@ -5,7 +5,7 @@ data class User(
     val password: String,
     val username: String,
     val avatarUrl: String,
-    val idUser: String,
+    val _id: String,
     val role: String,
     val otp: String
 )

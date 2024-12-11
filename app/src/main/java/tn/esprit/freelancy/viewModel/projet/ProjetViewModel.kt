@@ -27,6 +27,7 @@ import tn.esprit.freelancy.model.projet.ApplicationResponse
 import tn.esprit.freelancy.model.projet.ApplicationStatusRequest
 import tn.esprit.freelancy.model.projet.ApplicationStatusResponse
 import tn.esprit.freelancy.model.projet.ApplicationStatusResponsem
+import tn.esprit.freelancy.model.user.UserProfileCompletRes
 
 
 class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() {
@@ -41,8 +42,8 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
      val _showError = MutableStateFlow("")
     val showError: StateFlow<String?> get() = _showError
 
-    val _freelancer = MutableStateFlow<List<UserProfileComplet>>(emptyList()) // To store the selected project details
-    val freelancer: StateFlow<List<UserProfileComplet>> = _freelancer
+    val _freelancer = MutableStateFlow<List<UserProfileCompletRes>>(emptyList()) // To store the selected project details
+    val freelancer: StateFlow<List<UserProfileCompletRes>> = _freelancer
     val userId: String? = sessionManager.getUserId()
 
 

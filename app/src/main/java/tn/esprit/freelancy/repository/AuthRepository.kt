@@ -1,15 +1,22 @@
 package tn.esprit.freelancy.repository
 
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Response
+import tn.esprit.freelancy.model.user.ApiResponse
+import tn.esprit.freelancy.model.user.ApiResponse2
 import tn.esprit.freelancy.model.user.SignupRequest
 import tn.esprit.freelancy.model.user.SignupResponse
 import tn.esprit.freelancy.model.user.UpdateRoleRequest
+import tn.esprit.freelancy.model.user.UpdateSkillsRequest
 import tn.esprit.freelancy.model.user.UserProfile
 import tn.esprit.freelancy.model.user.UserProfile1
 import tn.esprit.freelancy.model.user.UserProfileComplet
 import tn.esprit.freelancy.remote.RetrofitClient
 import tn.esprit.freelancy.remote.RetrofitClient.authService
 import tn.esprit.freelancy.remote.UserAPI
+import java.io.File
 
 class AuthRepository(private val api: UserAPI) {
     fun login(email: String, password: String): Boolean {
@@ -28,9 +35,6 @@ class AuthRepository(private val api: UserAPI) {
         return api.fetchUserId(email)
     }
 
-    suspend fun updateUserProfile(updatedProfile: UserProfile1): UserProfile {
-        return api.updateUserProfile(updatedProfile)
-    }
 
     suspend fun signup(
         username: String,
@@ -65,6 +69,19 @@ class AuthRepository(private val api: UserAPI) {
             null // Handle API errors gracefully
         }
     }
+
+    suspend fun updateUserSkills(userId: String, skills: List<String>): ApiResponse2 {
+        val request = UpdateSkillsRequest(skills) // Wrap skills in the request object
+        val response = authService.updateSkills(userId, request)
+        println("Response from server update skills: $response")
+        if (response.isSuccessful) {
+            return response.body() ?: throw Exception("Empty response from server")
+        } else {
+            throw Exception("Failed to update skills: ${response.message()}")
+        }
+    }
+
+
 
 
 }

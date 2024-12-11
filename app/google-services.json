@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "487878832428",
+    "project_id": "freelancy-9051c",
+    "storage_bucket": "freelancy-9051c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:487878832428:android:0f303229257a5215d43c89",
+        "android_client_info": {
+          "package_name": "tn.esprit.freelancy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "487878832428-vj53vsmmsiqqsgg5v2ii07snqe840lo2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tn.esprit.freelancy",
+            "certificate_hash": "9007bfc90d628053076b40e034ff63b1f9cc0935"
+          }
+        },
+        {
+          "client_id": "487878832428-lpkn1qh554332dpp3ils9prbsmgpuirf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-eADUKXiqCOWjLIPHX1knxG_6208U5DE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "487878832428-lpkn1qh554332dpp3ils9prbsmgpuirf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

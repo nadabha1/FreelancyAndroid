@@ -58,6 +58,7 @@ fun EntrepreneurNotificationScreen(
             )
             it._id?.let { id ->
                 notificationViewModel.markNotificationAsRead(id)
+                notificationViewModel.fetchNotifications()
             } ?: Log.e("NotificationScreen", "Notification ID is null for message: ${it.message}")
         }
     }
@@ -71,7 +72,7 @@ fun EntrepreneurNotificationScreen(
             TopAppBar(
                 title = {
                     Text(
-                        "Entrepreneur Notifications",
+                        "Notifications",
                         style = MaterialTheme.typography.titleLarge.copy(color = Color.White)
                     )
                 },
@@ -175,6 +176,7 @@ fun EntrepreneurNotificationScreen(
                         onClick = {
                             notification._id?.let { id ->
                                 notificationViewModel.markNotificationAsRead(id) // Marquer comme lu
+                                notificationViewModel.fetchNotifications()
                                 showDialog = false
                             }
                         }

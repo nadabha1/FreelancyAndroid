@@ -1,15 +1,19 @@
 package tn.esprit.freelancy.remote
 
+import okhttp3.MultipartBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 import tn.esprit.freelancy.model.user.ApiResponse
+import tn.esprit.freelancy.model.user.ApiResponse2
 import tn.esprit.freelancy.model.user.ForgotPasswordRequest
 import tn.esprit.freelancy.model.user.GetRoleIdResponse
 import tn.esprit.freelancy.model.user.GetUserIdRequest
@@ -22,6 +26,7 @@ import tn.esprit.freelancy.model.user.ResetPasswordRequest
 import tn.esprit.freelancy.model.user.SignupRequest
 import tn.esprit.freelancy.model.user.SignupResponse
 import tn.esprit.freelancy.model.user.UpdateRoleRequest
+import tn.esprit.freelancy.model.user.UpdateSkillsRequest
 import tn.esprit.freelancy.model.user.UserProfile
 import tn.esprit.freelancy.model.user.UserProfile1
 import tn.esprit.freelancy.model.user.UserProfileComplet
@@ -58,9 +63,24 @@ interface UserAPI {
     suspend fun updateUserRole(@Body request: UpdateRoleRequest): Response<Any>
 
     @PATCH("user/createProfile")
-    suspend fun createUserProfile(@Body profile: UserProfileUpdateRequest): Response<Any>
+    suspend fun createUserProfile(@Body updateUserDto: UserProfileUpdateRequest): Response<Any>
 
 
     @POST("user/getIdRole")
     suspend fun getRoleName(@Body request: GetUserIdResponse): GetRoleIdResponse
+
+    @Multipart
+    @POST("cv-analysis/upload/{userId}")
+    suspend fun uploadCv(
+        @Path("userId") userId: String,
+        @Part file: MultipartBody.Part
+    ): ApiResponse2
+
+    @PATCH("user/updateSkills/{userId}")
+    suspend fun updateSkills(
+        @Path("userId") userId: String,
+        @Body updateSkillsRequest: UpdateSkillsRequest
+    ): Response<ApiResponse2>
+
+
 }

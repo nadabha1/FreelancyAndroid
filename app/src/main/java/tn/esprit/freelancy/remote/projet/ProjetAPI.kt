@@ -11,6 +11,7 @@ import tn.esprit.freelancy.model.projet.Project
 import tn.esprit.freelancy.model.projet.ProjectResponse
 import tn.esprit.freelancy.model.projet.Projet
 import tn.esprit.freelancy.model.user.UserProfileComplet
+import tn.esprit.freelancy.model.user.UserProfileCompletRes
 
 interface ProjetAPI {
     @POST("projet/add")
@@ -51,7 +52,7 @@ interface ProjetAPI {
     ): Notification
 
     @GET("application/project/{projectId}")
-    suspend fun getFreelancersByProjectId(@Path("projectId") projectId: String): List<UserProfileComplet>
+    suspend fun getFreelancersByProjectId(@Path("projectId") projectId: String): List<UserProfileCompletRes>
     @PATCH("application/{id}/status")
     suspend fun updateApplicationStatus(
         @Path("id") applicationId: String,

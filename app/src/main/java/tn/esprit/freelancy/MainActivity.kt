@@ -19,17 +19,20 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import tn.esprit.freelancy.remote.RetrofitClient
 import tn.esprit.freelancy.repository.AuthRepository
+import tn.esprit.freelancy.repository.CvRepository
 import tn.esprit.freelancy.repository.NotificationRepository
 import tn.esprit.freelancy.session.PreferenceManager
 import tn.esprit.freelancy.session.SessionManager
 import tn.esprit.freelancy.ui.theme.JetpackComposeAuthUITheme
 import tn.esprit.freelancy.view.CreateProfileScreen
 import tn.esprit.freelancy.view.CvAnalysisScreen
+import tn.esprit.freelancy.view.CvUploadScreen
 import tn.esprit.freelancy.view.EditProfileScreen
 import tn.esprit.freelancy.view.ForgotPasswordScreen
 import tn.esprit.freelancy.view.Home
 import tn.esprit.freelancy.view.HomeContent
 import tn.esprit.freelancy.view.LoginScreen
+import tn.esprit.freelancy.view.ManualSkillsEntryScreen
 import tn.esprit.freelancy.view.ProfileScreen
 import tn.esprit.freelancy.view.RoleSelectionScreen
 import tn.esprit.freelancy.view.SignupScreen
@@ -41,6 +44,8 @@ import tn.esprit.freelancy.view.projet.OngoingProjectsScreen
 import tn.esprit.freelancy.view.projet.ProjectDetailScreen
 import tn.esprit.freelancy.view.projet.ProjectDetailScreenForEntrepreneur
 import tn.esprit.freelancy.view.projet.ProjetListScreen
+import tn.esprit.freelancy.viewModel.CvViewModel
+import tn.esprit.freelancy.viewModel.CvViewModelFactory
 import tn.esprit.freelancy.viewModel.ForgotPasswordViewModel
 import tn.esprit.freelancy.viewModel.HomeViewModel
 import tn.esprit.freelancy.viewModel.HomeViewModelFactory
@@ -80,6 +85,15 @@ fun NavigationView(preferenceManager: PreferenceManager) {
         composable("login") {
 
             LoginScreen(navController = navController,SessionManager(LocalContext.current))
+        }
+        composable("cv_upload/{username}") {backStackEntry ->
+            val email = backStackEntry.arguments?.getString("username") ?: ""
+            val cvRepository: CvRepository = CvRepository(RetrofitClient.cvApiService)
+            val homeViewModel: CvViewModel = viewModel(factory = CvViewModelFactory(cvRepository)) // Use the factory%
+            LaunchedEffect(email) {
+                homeViewModel.fetchUser(email)
+            }
+            CvUploadScreen(homeViewModel,email)
         }
         composable("home/{email}") { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
@@ -121,6 +135,7 @@ fun NavigationView(preferenceManager: PreferenceManager) {
             val viewModel: ProjetViewModel = viewModel(
                 factory = ProjetViewModelFactory(repository)
             )
+
             ProjectDetailScreenForEntrepreneur(navController = navController, projectId = projectId, viewModel =viewModel)
 
 
@@ -137,6 +152,16 @@ fun NavigationView(preferenceManager: PreferenceManager) {
                 ,notificationViewModel = NotificationViewModel(NotificationRepository(RetrofitClient.projetApi),sessionManager = SessionManager(LocalContext.current)),navController
                 )
         }
+        composable("manual_skills_entry/{username}") { backStackEntry ->
+            val username = backStackEntry.arguments?.getString("username") ?: ""
+            val cvRepository: CvRepository = CvRepository(RetrofitClient.cvApiService)
+            val homeViewModel: CvViewModel = viewModel(factory = CvViewModelFactory(cvRepository)) // Use the factory%
+            LaunchedEffect(username) {
+                homeViewModel.fetchUser(username)
+            }
+            ManualSkillsEntryScreen(homeViewModel,navController, username)
+        }
+
         composable("profile/{email}") { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
             val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(SessionManager(LocalContext.current))) // Use the factory

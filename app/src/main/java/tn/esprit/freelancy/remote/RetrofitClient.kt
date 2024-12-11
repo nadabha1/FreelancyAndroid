@@ -5,8 +5,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import tn.esprit.freelancy.remote.projet.ProjetAPI
 
 object RetrofitClient {
-private const val BASE_URL = "http://192.168.1.40:3000/" // Replace with your backend URL
-//private const val BASE_URL = "http://172.18.6.197:3000/" // Replace with your backend URL
+    //private const val BASE_URL = "http://172.16.8.108:3000/" // Replace with your backend URL
+private const val BASE_URL = "http://192.168.2.1:3000/" // Replace with your backend URL
 
     val authService: UserAPI by lazy {
         Retrofit.Builder()

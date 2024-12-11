@@ -39,7 +39,7 @@ fun OngoingProjectsScreen(navController: NavController, viewModel: ProjetViewMod
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Ongoing Projects", color = Color.White) },
+                title = { Text(text = "List of project ", color = Color.White) },
                 colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFF003F88))
             )
         },

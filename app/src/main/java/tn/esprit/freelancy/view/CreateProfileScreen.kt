@@ -41,22 +41,16 @@ fun CreateProfileScreen(
 ) {
     var dateOfBirth by remember { mutableStateOf("") }
     var country by remember { mutableStateOf("Tunisia") }
-    var streetAddress by remember { mutableStateOf("") }
-    var aptSuite by remember { mutableStateOf("") }
-    val userRepository : AuthRepository = AuthRepository(RetrofitClient.authService)
-    val viewModel: UpdateProfileViewModel = viewModel(
-        factory = UpdateProfileViewModelFactory(userRepository ))
-    // State to hold the selected image URI
-
-    val updateSuccess by viewModel.updateSuccess.collectAsState()
     var profileImageUri by remember { mutableStateOf<Uri?>(null) }
+    var showPopup by remember { mutableStateOf(false) } // State for popup visibility
 
-    // Launcher to pick an image
+    val userRepository: AuthRepository = AuthRepository(RetrofitClient.authService)
+    val viewModel: UpdateProfileViewModel = viewModel(factory = UpdateProfileViewModelFactory(userRepository))
+    val updateSuccess by viewModel.updateSuccess.collectAsState()
+
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            profileImageUri = uri // Update the selected image URI
-        }
+        onResult = { uri: Uri? -> profileImageUri = uri }
     )
 
     Box(
@@ -84,7 +78,6 @@ fun CreateProfileScreen(
                 modifier = Modifier.size(120.dp),
                 contentAlignment = Alignment.BottomEnd
             ) {
-                // Display the selected image or placeholder
                 if (profileImageUri != null) {
                     Image(
                         painter = rememberAsyncImagePainter(model = profileImageUri),
@@ -105,9 +98,8 @@ fun CreateProfileScreen(
                     )
                 }
 
-                // Upload Icon Button
                 IconButton(
-                    onClick = { imagePickerLauncher.launch("image/*") }, // Open image picker
+                    onClick = { imagePickerLauncher.launch("image/*") },
                     modifier = Modifier
                         .size(32.dp)
                         .background(Color(0xFF1E88E5), RoundedCornerShape(16.dp))
@@ -124,17 +116,6 @@ fun CreateProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = { imagePickerLauncher.launch("image/*") }, // Open image picker
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Upload Photo", color = Color(0xFF1E88E5))
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Input Fields (Date of Birth, Country, etc.)
             OutlinedTextField(
                 value = dateOfBirth,
                 onValueChange = { dateOfBirth = it },
@@ -162,17 +143,15 @@ fun CreateProfileScreen(
                 )
             )
 
-
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Submit Button
             Button(
                 onClick = {
                     viewModel.updateUserProfile(
                         username = username,
-                        dateOfBirth = dateOfBirth,
-                        country = country,
-                        profilePictureUrl = profileImageUri.toString() // Send the image URI
+                        dateOfBirth = dateOfBirth.ifEmpty { "2000-01-01" },
+                        country = country.ifEmpty { "Unknown" },
+                        profilePictureUrl = profileImageUri?.toString() ?: ""
                     )
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5)),
@@ -182,14 +161,63 @@ fun CreateProfileScreen(
             }
         }
     }
+
     if (updateSuccess) {
         LaunchedEffect(Unit) {
-            navController.navigate("login") {
-                popUpTo("update_profile/{username}") { inclusive = true }
-            }
+            showPopup = true
         }
     }
+
+    if (showPopup) {
+        SkillSelectionPopup(
+            onManualEntry = {
+                showPopup = false
+                navController.navigate("manual_skills_entry/$username")
+            },
+            onUploadCV = {
+                showPopup = false
+                navController.navigate("cv_upload/$username")
+            }
+        )
+    }
 }
+@Composable
+fun SkillSelectionPopup(
+    onManualEntry: () -> Unit,
+    onUploadCV: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = { },
+        title = { Text(text = "How would you like to tell us about yourself?") },
+        text = {
+            Text(
+                text = "We need to get a sense of your education, experience, and skills. You can edit it before your profile goes live."
+            )
+        },
+        confirmButton = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Button(
+                    onClick = onUploadCV,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text("Upload Your Resume")
+                }
+                Button(
+                    onClick = onManualEntry,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ) {
+                    Text("Fill Out Manually (15 min)")
+                }
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.background
+    )
+}
+
 
 @Preview(showBackground = true)
 @Composable

@@ -43,11 +43,12 @@ class UpdateProfileViewModel(private val userRepository: AuthRepository) : ViewM
                     // Mettre à jour les données de l'utilisateur
                     _user.value = response
                     _userProfile.value = UserProfile(
-                        idUser = response.user.idUser!!,
+                        _id = response.user._id!!,
                         username = response.user    .username,
                         email = response.user.email,
                         avatarUrl = "https://i.pravatar.cc/150?img=3" // Avatar par défaut
                     )
+                    println("User profile fetched successfully $userProfile")
                     _errorMessage.value = null
                 } else {
                     _errorMessage.value = "User not found"
@@ -83,30 +84,36 @@ class UpdateProfileViewModel(private val userRepository: AuthRepository) : ViewM
         }
     }
 
-    fun updateUserProfile(username: String,dateOfBirth: String, country: String, profilePictureUrl: String) {
+    fun updateUserProfile(username: String, dateOfBirth: String, country: String, profilePictureUrl: String) {
         viewModelScope.launch {
             try {
+                println("Sending update request:")
+                println("Username: $username")
+                println("Date of Birth: $dateOfBirth")
+                println("Country: $country")
+                println("Profile Picture URL: $profilePictureUrl")
 
                 val response = RetrofitClient.authService.createUserProfile(
                     UserProfileUpdateRequest(username, dateOfBirth, country, profilePictureUrl)
                 )
+
+                println("Response: $response")
+
                 if (response.isSuccessful) {
-                        println("user profile updated successfully")
+                    println("User profile updated successfully")
                     _updateSuccess.value = true
                 } else {
+                    println("Update failed: ${response.errorBody()?.string()}")
                     _updateSuccess.value = false
-                    println("user profile update failed")
-
                 }
             } catch (e: Exception) {
-                println("user profile update failed")
+                println("Error updating profile: ${e.message}")
                 _updateSuccess.value = false
                 e.printStackTrace()
             }
         }
-
-
     }
+
 
 
 

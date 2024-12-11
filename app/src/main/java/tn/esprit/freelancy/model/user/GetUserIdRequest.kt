@@ -33,6 +33,11 @@ data class ApiResponse(
     val otp:String="123"
 
 )
+data class ApiResponse2(
+    val message: String,
+    val skills: List<String>,
+    val user: User
+)
 data class Otp(
     val otp:String="123"
 

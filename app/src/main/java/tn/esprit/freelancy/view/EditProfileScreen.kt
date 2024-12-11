@@ -111,7 +111,7 @@ fun EditProfileScreen(
 
                     userProfile?.let {
                         val updatedProfile = UserProfile1(
-                            idUser = it.idUser,
+                            idUser = it._id,
                             username = nameState,
                             email = emailState
                         )
