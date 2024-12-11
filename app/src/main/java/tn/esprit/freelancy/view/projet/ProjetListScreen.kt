@@ -41,7 +41,6 @@ fun ProjetListScreen(
     onAddProject: () -> Unit
 ) {
 
-    val userId = sessionManager.getUserId()
     val projects by viewModel.projects.collectAsState(initial = emptyList())
     var isLoading by remember { mutableStateOf(true) }
     val userEmail by sessionManager.userEmail.collectAsState(initial = null)

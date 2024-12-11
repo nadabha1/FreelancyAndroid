@@ -55,6 +55,10 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
             try {
                 if (userId != null) {
                    val response = RetrofitClient.projetApi.getAllProjectsById(userId)
+                    _projects.value = response
+                }
+                if (userId == null) {
+                    Log.e("ProjetViewModel", "User ID is null or undefined")
                 }
             } catch (e: Exception) {
                 println("Error fetching projects: ${e.message}")
@@ -136,51 +140,33 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
         }
     }
 
+    data class ApplyResult(val isSuccessful: Boolean, val errorMessage: String? = null)
 
-
-    fun applyForProject(projectId: String, context: Context) {
-        viewModelScope.launch {
-            try {
-                if (userId != null) {
-                    val applicationRequest = ApplicationRequest(
-                        freelancer = userId,
-                        project = projectId,
-                        status = "Pending" // Make sure status is a valid string
-                    )
-
-                    // Log the request for debugging purposes
-                    println("Sending application request: $applicationRequest")
-
-                    // Send the application request using Retrofit
-                    val response = RetrofitClient.projetApi.createApplication(applicationRequest)
-
-                    // Handle success response
-                    println("Application submitted successfully: $response")
-                } else {
-                    showErrorDialog(context, "User not logged in")
-                }
-            } catch (e: Exception) {
-                // Handle error and provide more details
-                if (e is HttpException) {
-                    val errorResponse = e.response()?.errorBody()?.string()
-                    // Extract only the message from the error JSON response
-                    val errorMessage = extractErrorMessage(errorResponse)
-                    showErrorDialog(context, errorMessage)
-                } else {
-                    showErrorDialog(context, "${e.message}")
-                }
+    val _success = MutableStateFlow<Boolean?>(false)
+    val success: StateFlow<Boolean?> = _success
+    suspend fun applyForProject(projectId: String, context: Context): ApplyResult {
+        return try {
+            if (userId != null) {
+                val applicationRequest = ApplicationRequest(
+                    freelancer = userId,
+                    project = projectId,
+                    status = "Pending" // Ensure the status is valid
+                )
+                println("Sending application request: $applicationRequest")
+                val response = RetrofitClient.projetApi.createApplication(applicationRequest)
+                println("Application submitted successfully: $response")
+                ApplyResult(isSuccessful = true)
+            } else {
+                ApplyResult(isSuccessful = false, errorMessage = "User not logged in")
             }
+        } catch (e: Exception) {
+            val errorMessage = if (e is HttpException) {
+                extractErrorMessage(e.response()?.errorBody()?.string())
+            } else {
+                e.message ?: "Unknown error"
+            }
+            ApplyResult(isSuccessful = false, errorMessage = errorMessage)
         }
-    }
-
-    fun showErrorDialog(context: Context, errorMessage: String) {
-        AlertDialog.Builder(context)
-            .setTitle(" Error applying for project: ")
-            .setMessage(errorMessage)
-            .setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
     }
 
 

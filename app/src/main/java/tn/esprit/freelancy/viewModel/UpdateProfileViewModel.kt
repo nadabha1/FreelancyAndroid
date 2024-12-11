@@ -43,7 +43,7 @@ class UpdateProfileViewModel(private val userRepository: AuthRepository) : ViewM
                     // Mettre à jour les données de l'utilisateur
                     _user.value = response
                     _userProfile.value = UserProfile(
-                        _id = response.user._id!!,
+                        _id = response.user._id,
                         username = response.user    .username,
                         email = response.user.email,
                         avatarUrl = "https://i.pravatar.cc/150?img=3" // Avatar par défaut

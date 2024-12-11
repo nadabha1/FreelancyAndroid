@@ -30,7 +30,6 @@ import tn.esprit.freelancy.view.CvUploadScreen
 import tn.esprit.freelancy.view.EditProfileScreen
 import tn.esprit.freelancy.view.ForgotPasswordScreen
 import tn.esprit.freelancy.view.Home
-import tn.esprit.freelancy.view.HomeContent
 import tn.esprit.freelancy.view.LoginScreen
 import tn.esprit.freelancy.view.ManualSkillsEntryScreen
 import tn.esprit.freelancy.view.ProfileScreen
@@ -93,16 +92,14 @@ fun NavigationView(preferenceManager: PreferenceManager) {
             LaunchedEffect(email) {
                 homeViewModel.fetchUser(email)
             }
-            CvUploadScreen(homeViewModel,email)
-        }
-        composable("home/{email}") { backStackEntry ->
-            val email = backStackEntry.arguments?.getString("email") ?: ""
-            val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(SessionManager(LocalContext.current))) // Use the factory
-            HomeContent(navController, email, viewModel())
+            CvUploadScreen(homeViewModel,navController, email)
         }
         composable("homeC/{email}") { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
             val homeViewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(SessionManager(LocalContext.current))) // Use the factory
+            LaunchedEffect(Unit) {
+                homeViewModel.fetchProjectByIa()
+            }
             Home(navController, email, homeViewModel, SessionManager(LocalContext.current))
         }
 

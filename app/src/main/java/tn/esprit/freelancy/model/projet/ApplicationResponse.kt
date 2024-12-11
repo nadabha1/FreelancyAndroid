@@ -1,7 +1,7 @@
 package tn.esprit.freelancy.model.projet
 
 data class ApplicationResponse(
-    val id: String,
+    val _id: String,
     val freelancer: String,
     val project: String,
     val status: String

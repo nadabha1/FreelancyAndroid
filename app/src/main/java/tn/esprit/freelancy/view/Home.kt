@@ -52,293 +52,35 @@ import tn.esprit.freelancy.model.user.Client
 import tn.esprit.freelancy.model.user.Job
 import tn.esprit.freelancy.session.SessionManager
 import tn.esprit.freelancy.viewModel.HomeViewModel
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun Home(navController: NavController, email: String, viewModel: HomeViewModel, sessionManager: SessionManager) {
-//
-//    val projects by viewModel.projectsIa.collectAsState(initial = emptyList())
-//    var filteredProjects by remember { mutableStateOf(projects) }
-//    var isLoading by remember { mutableStateOf(true) }
-//    var isBestMatch by remember { mutableStateOf(false) } // Track Best Matches vs Most Recent
-//    var isBestMatchSelected by remember { mutableStateOf(false) } // Track if Best Match button is selected
-//    var isMostRecentSelected by remember { mutableStateOf(false) } // Track if Most Recent button is selected
-//    val userId = sessionManager.getUserId()
-//    val userEmail by sessionManager.userEmail.collectAsState(initial = null)
-//
-//    val email2 = userEmail
-//    // Fetch projects assuming userId is available
-//    LaunchedEffect(Unit) {
-//        viewModel.fetchProjectByIa()
-//        isLoading = false
-//    }
-//
-//    // Apply filtering logic based on isBestMatch
-//    LaunchedEffect(isBestMatch) {
-//        filteredProjects = if (isBestMatch) {
-//            // Filter projects with score > 50%
-//            projects.filter { it.score >= 0.5 }
-//        } else {
-//            // Show all projects (Most Recent)
-//            projects
-//        }
-//    }
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//    ) {
-//        TopAppBar(
-//            title = { Text(text = "Jobs", color = Color.White) },
-//            actions = {
-//                // Profile Button
-//                IconButton(onClick = {
-//                    // Navigate to Profile Screen
-//                    navController.navigate("profile/$email2")
-//                }) {
-//                    androidx.compose.material3.Icon(Icons.Filled.Person, contentDescription = "Home", tint = Color.White)
-//                }
-//            },
-//            colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = Color(0xFF003F88))
-//        )
-//
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .background(Color(0xFF001E6C))
-//                .padding(16.dp)
-//        ) {
-//            // Header
-//
-//            Spacer(modifier = Modifier.height(16.dp))
-//
-//            // Search Bar
-//            var query by remember { mutableStateOf("") }
-//            TextField(
-//                value = query,
-//                onValueChange = { query = it },
-//                placeholder = { Text("Search for jobs", color = Color.Gray) },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .background(Color(0xFF007BFF), RoundedCornerShape(8.dp)) // Blue background for search
-//                    .padding(12.dp),
-//                colors = TextFieldDefaults.textFieldColors(
-//                    textColor = Color.White,
-//                    cursorColor = Color.White,
-//                    focusedIndicatorColor = Color.Transparent,
-//                    unfocusedIndicatorColor = Color.Transparent
-//                )
-//            )
-//
-//            Spacer(modifier = Modifier.height(16.dp))
-//
-//            // Tabs
-//            Row(
-//                modifier = Modifier.fillMaxWidth(),
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ) {
-//                Button(
-//                    onClick = {
-//                        isBestMatch = true
-//                        isBestMatchSelected = true
-//                        isMostRecentSelected = false // Reset Most Recent selection
-//                    },
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = if (isBestMatchSelected) Color(0xFF0056B3) else Color(0xFF003F88)
-//                    ) // Change color when selected
-//                ) {
-//                    Text(text = "Best Matches", color = Color.White)
-//                }
-//                Button(
-//                    onClick = {
-//                        isBestMatch = false
-//                        isMostRecentSelected = true
-//                        isBestMatchSelected = false // Reset Best Match selection
-//                    },
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = if (isMostRecentSelected) Color(0xFF0056B3) else Color(0xFF003F88)
-//                    ) // Change color when selected
-//                ) {
-//                    Text(text = "Most Recent", color = Color.White)
-//                }
-//            }
-//
-//            Spacer(modifier = Modifier.height(16.dp))
-//
-//            // Job List
-//            LazyColumn(modifier = Modifier.fillMaxSize()) {
-//                if (isLoading) {
-//                    item {
-//                        Box(
-//                            modifier = Modifier.fillMaxSize(),
-//                            contentAlignment = Alignment.Center
-//                        ) {
-//                            CircularProgressIndicator()
-//                        }
-//                    }
-//                } else if (filteredProjects.isEmpty()) {
-//                    item {
-//                        Box(
-//                            modifier = Modifier.fillMaxSize(),
-//                            contentAlignment = Alignment.Center
-//                        ) {
-//                            Text("No ongoing projects", color = Color.White)
-//                        }
-//                    }
-//                } else {
-//                    items(filteredProjects) { project ->
-//                        ProjetCard(project, onClick = {
-//                            // Handle card click
-//                        })
-//
-//                        Spacer(modifier = Modifier.height(16.dp))
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//fun ProjetCard(project: Project, onClick: () -> Unit) {
-//    // Convert score to percentage
-//    val scorePercentage = (project.score * 100).toInt()
-//
-//    // Determine color based on score
-//    val scoreColor = if (scorePercentage >= 50) Color.Green else Color.Red
-//
-//    Card(
-//        shape = RoundedCornerShape(8.dp),
-//        colors = CardDefaults.cardColors(containerColor = Color(0xFF0056B3)),
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .padding(8.dp)
-//            .clickable { onClick() },
-//        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-//    ) {
-//        Column(modifier = Modifier.padding(16.dp)) {
-//            // Project Title
-//            Text(
-//                text = project.title,
-//                color = Color.White,
-//                fontWeight = FontWeight.Bold,
-//                fontSize = 16.sp,
-//                maxLines = 1,
-//                overflow = TextOverflow.Ellipsis
-//            )
-//
-//            // Project Description
-//            Text(
-//                text = project.description,
-//                color = Color.LightGray,
-//                fontSize = 14.sp,
-//                maxLines = 2,
-//                overflow = TextOverflow.Ellipsis,
-//                modifier = Modifier.padding(top = 8.dp)
-//            )
-//
-//            // Technologies Used
-//            Text(
-//                text = "Technologies: ${project.technologies}",
-//                color = Color.White,
-//                fontSize = 12.sp,
-//                modifier = Modifier.padding(top = 8.dp)
-//            )
-//
-//            // Additional Info (Budget & Status)
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(top = 8.dp),
-//                horizontalArrangement = Arrangement.SpaceBetween
-//            ) {
-//                Column {
-//                    Text(
-//                        text = "Budget: ${project.budget} USD",
-//                        color = Color.LightGray,
-//                        fontSize = 12.sp
-//                    )
-//                    Text(
-//                        text = "Status: ${project.status}",
-//                        color = Color.LightGray,
-//                        fontSize = 12.sp
-//                    )
-//                }
-//
-//                // Show score as percentage and color it
-//                Text(
-//                    text = "Score: $scorePercentage%",
-//                    color = scoreColor, // Color changes based on score
-//                    fontWeight = FontWeight.Bold,
-//                    fontSize = 16.sp,
-//                    maxLines = 1,
-//                    overflow = TextOverflow.Ellipsis
-//                )
-//            }
-//        }
-//    }
-//}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(navController: NavController, email: String, viewModel: HomeViewModel, sessionManager: SessionManager) {
 
+    // Collect projects and loading state from the ViewModel
     val projects by viewModel.projectsIa.collectAsState(initial = emptyList())
-    var filteredProjects by remember { mutableStateOf(projects) }
-    var isLoading by remember { mutableStateOf(true) }
-    var isBestMatch by remember { mutableStateOf(false) } // Track Best Matches vs Most Recent
-    var isBestMatchSelected by remember { mutableStateOf(false) } // Track if Best Match button is selected
-    var isMostRecentSelected by remember { mutableStateOf(false) } // Track if Most Recent button is selected
-    val userId = sessionManager.getUserId()
-    val userEmail by sessionManager.userEmail.collectAsState(initial = null)
-    val email2 = userEmail
+    val isLoading by viewModel.isLoading.collectAsState()
 
-    // Fetch projects assuming userId is available
-    LaunchedEffect(Unit) {
-        viewModel.fetchProjectByIa()
-        isLoading = false
-    }
-
-    // Apply filtering logic based on isBestMatch
-    LaunchedEffect(isBestMatch) {
-        filteredProjects = if (isBestMatch) {
-            // Filter projects with score > 50%
-            projects.filter { it.score >= 0.5 }
-        } else {
-            // Show all projects (Most Recent)
-            projects
-        }
-    }
-
-    // Search functionality
+    var filteredProjects by remember { mutableStateOf(emptyList<Project>()) }
+    var isBestMatch by remember { mutableStateOf(true) }
     var query by remember { mutableStateOf("") }
 
-    // Update filteredProjects based on the search query
-    LaunchedEffect(query) {
-        filteredProjects = if (query.isNotEmpty()) {
-            projects.filter {
-                it.title.contains(query, ignoreCase = true) || it.description.contains(query, ignoreCase = true)
-            }
-        } else {
-            // If the query is empty, show all projects or filter based on Best Match
-            if (isBestMatch) {
-                projects.filter { it.score >= 0.5 }
-            } else {
-                projects
-            }
+    // Dynamically filter projects when the state changes
+    LaunchedEffect(projects, isBestMatch, query) {
+        filteredProjects = projects.filter {
+            (query.isEmpty() || it.title.contains(query, ignoreCase = true) || it.description.contains(query, ignoreCase = true)) &&
+                    (!isBestMatch || it.score >= 0.5)
         }
     }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         TopAppBar(
             title = { Text(text = "Jobs", color = Color.White) },
             actions = {
                 // Profile Button
                 IconButton(onClick = {
-                    // Navigate to Profile Screen
-                    navController.navigate("profile/$email2")
+                    navController.navigate("profile/$email")
                 }) {
                     androidx.compose.material3.Icon(Icons.Filled.Person, contentDescription = "Home", tint = Color.White)
                 }
@@ -361,7 +103,7 @@ fun Home(navController: NavController, email: String, viewModel: HomeViewModel, 
                 placeholder = { Text("Search for jobs", color = Color.Gray) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF007BFF), RoundedCornerShape(8.dp)) // Blue background for search
+                    .background(Color(0xFF007BFF), RoundedCornerShape(8.dp))
                     .padding(12.dp),
                 colors = TextFieldDefaults.textFieldColors(
                     textColor = Color.White,
@@ -379,26 +121,18 @@ fun Home(navController: NavController, email: String, viewModel: HomeViewModel, 
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(
-                    onClick = {
-                        isBestMatch = true
-                        isBestMatchSelected = true
-                        isMostRecentSelected = false // Reset Most Recent selection
-                    },
+                    onClick = { isBestMatch = true },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isBestMatchSelected) Color(0xFF0056B3) else Color(0xFF003F88)
-                    ) // Change color when selected
+                        containerColor = if (isBestMatch) Color(0xFF0056B3) else Color(0xFF003F88)
+                    )
                 ) {
                     Text(text = "Best Matches", color = Color.White)
                 }
                 Button(
-                    onClick = {
-                        isBestMatch = false
-                        isMostRecentSelected = true
-                        isBestMatchSelected = false // Reset Best Match selection
-                    },
+                    onClick = { isBestMatch = false },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isMostRecentSelected) Color(0xFF0056B3) else Color(0xFF003F88)
-                    ) // Change color when selected
+                        containerColor = if (!isBestMatch) Color(0xFF0056B3) else Color(0xFF003F88)
+                    )
                 ) {
                     Text(text = "Most Recent", color = Color.White)
                 }
@@ -423,15 +157,14 @@ fun Home(navController: NavController, email: String, viewModel: HomeViewModel, 
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("No ongoing projects", color = Color.White)
+                            Text("No jobs found", color = Color.White)
                         }
                     }
                 } else {
                     items(filteredProjects) { project ->
                         ProjetCard(project, onClick = {
-                            // Handle card click
+                            navController.navigate("project_detail/${project.id}")
                         })
-
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }

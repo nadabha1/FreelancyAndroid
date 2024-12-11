@@ -1,4 +1,5 @@
 package tn.esprit.freelancy.view
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,8 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,52 +32,51 @@ import tn.esprit.freelancy.session.SessionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavController, user: UserProfileComplet,sessionManager: SessionManager) {
-    // Check if critical user fields are null
-    if (user.username.isEmpty()) {
-        Text(text = "No user information available", color = MaterialTheme.colorScheme.error)
-        return
-    }
+fun ProfileScreen(navController: NavController, user: UserProfileComplet, sessionManager: SessionManager) {
     val role = sessionManager.getSession()?.role
-    println("Role in ProfileScreennnnnnnnn: $role")
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Toolbar with Back Button
-        TopAppBar(
-            title = { Text("Profile", color = Color.White) },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color(0xFF1E88E5))
-        )
-        // Render the user profile if fields are valid
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Profile", color = Color.White, fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = Color.White
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color(0xFF1E88E5))
+            )
+        }
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF6F6F6))
-                .padding(16.dp)
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFF0047AB), Color(0xFF002D72))
+                    )
+                )
+                .padding(innerPadding)
+                .padding(16.dp),
+            contentAlignment = Alignment.TopCenter
         ) {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Toolbar with Back Button
-
-
-                // Profile Image Section
+                // Profile Image
                 Image(
                     painter = rememberAsyncImagePainter(
                         model = user.avatarUrl ?: R.drawable.profile_placeholder
                     ),
                     contentDescription = "Profile Picture",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(120.dp)
                         .clip(RoundedCornerShape(60.dp))
@@ -83,23 +85,23 @@ fun ProfileScreen(navController: NavController, user: UserProfileComplet,session
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // User Details Section
+                // Username
                 Text(
                     text = user.username ?: "No username",
-                    fontSize = 20.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E88E5)
+                    color = Color.White
                 )
 
+                // Email
                 Text(
                     text = user.email ?: "No email",
                     fontSize = 16.sp,
-                    color = Color.Gray
+                    color = Color.LightGray
                 )
 
                 Spacer(modifier = Modifier.height(32.dp))
-                println(user.country)
-                println(user.idUser)
+
                 // Details Card
                 Card(
                     modifier = Modifier
@@ -116,38 +118,36 @@ fun ProfileScreen(navController: NavController, user: UserProfileComplet,session
                         ProfileDetailRow(
                             icon = Icons.Default.Person,
                             label = "Date of Birth",
-                            value1 = user.dateOfBirth ?: "Not provided"
+                            value = user.dateOfBirth ?: "Not provided"
                         )
                         ProfileDetailRow(
                             icon = Icons.Default.Home,
                             label = "Country",
-                            value1 = user.country ?: "Not provided"
-
+                            value = user.country ?: "Not provided"
                         )
                         ProfileDetailRow(
                             icon = Icons.Default.Settings,
                             label = "Role",
-                            value1 = role ?: "No role assigned"
+                            value = role ?: "No role assigned"
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
-
-                // Log out and Delete Account Buttons
+                // Actions Buttons
                 Button(
                     onClick = {
                         sessionManager.clearSession()
                         navController.navigate("login")
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5)),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
                 ) {
                     Text("Log Out", color = Color.White)
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
 
                 Button(
                     onClick = { /* Handle account deletion */ },
@@ -160,10 +160,13 @@ fun ProfileScreen(navController: NavController, user: UserProfileComplet,session
         }
     }
 }
+
 @Composable
-fun ProfileDetailRow(icon: ImageVector, label: String, value1: String) {
+fun ProfileDetailRow(icon: ImageVector, label: String, value: String) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -177,7 +180,7 @@ fun ProfileDetailRow(icon: ImageVector, label: String, value1: String) {
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = label, fontSize = 16.sp, color = Color.Gray)
         }
-        Text(text = value1, fontSize = 16.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+        Text(text = value, fontSize = 16.sp, color = Color.Black, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -185,12 +188,15 @@ fun ProfileDetailRow(icon: ImageVector, label: String, value1: String) {
 @Composable
 fun ProfileScreenPreview() {
     val dummyUser = UserProfileComplet(
-        username = "nada",
-        email = "nada@example.com",
-        avatarUrl = "dcfvghj", // Replace with valid URL for testing
+        username = "John Doe",
+        email = "john.doe@example.com",
+        avatarUrl = "https://via.placeholder.com/150",
         idUser = "123",
         role = "Freelancer"
-
     )
-    ProfileScreen(navController = rememberNavController(), user = dummyUser, sessionManager = SessionManager(LocalContext.current))
+    ProfileScreen(
+        navController = rememberNavController(),
+        user = dummyUser,
+        sessionManager = SessionManager(LocalContext.current)
+    )
 }

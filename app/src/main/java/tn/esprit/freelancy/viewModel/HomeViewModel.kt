@@ -41,12 +41,15 @@ class HomeViewModel(private val sessionManager: SessionManager)  : ViewModel() {
 
     private val _updateSuccess = MutableStateFlow<Boolean?>(null)
     val updateSuccess: StateFlow<Boolean?> = _updateSuccess
-
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
     val userProfilel = MutableStateFlow<UserProfileComplet?>(null)
 
     // Fetch user profile by email
     fun fetchUserProfile(email: String) {
         viewModelScope.launch {
+            _isLoading.value = true
+
             try {
                 println("Fetching user profile for email: $email") // Debug log
                 val user = RetrofitClient.authService.getUserProfile(email)
@@ -61,6 +64,10 @@ class HomeViewModel(private val sessionManager: SessionManager)  : ViewModel() {
             } catch (e: Exception) {
                 println("Error fetching user profile: ${e.message}") // Debug log
                 _userProfile2.value = null
+
+            }
+            finally {
+                _isLoading.value = false
             }
         }
     }

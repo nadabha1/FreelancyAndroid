@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="tn.esprit.freelancy" />
+                  <option name="mobileSdkAppId" value="1:487878832428:android:0f303229257a5215d43c89" />
+                  <option name="projectId" value="freelancy-9051c" />
+                  <option name="projectNumber" value="487878832428" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
