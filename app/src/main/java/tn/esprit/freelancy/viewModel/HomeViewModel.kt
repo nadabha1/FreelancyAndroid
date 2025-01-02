@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import tn.esprit.freelancy.model.chat.AppState
 import tn.esprit.freelancy.model.projet.Project
 import tn.esprit.freelancy.model.projet.Projet
 import tn.esprit.freelancy.model.user.GetRoleIdResponse
@@ -12,6 +14,7 @@ import tn.esprit.freelancy.model.user.GetUserIdResponse
 import tn.esprit.freelancy.model.user.GetUserResponse
 import tn.esprit.freelancy.model.user.GetUserResponsetest
 import tn.esprit.freelancy.model.user.UserProfileComplet
+import tn.esprit.freelancy.model.user.UserProfileFireBase
 import tn.esprit.freelancy.remote.RetrofitClient
 import tn.esprit.freelancy.session.SessionManager
 
@@ -23,6 +26,7 @@ class HomeViewModel(private val sessionManager: SessionManager)  : ViewModel() {
     val projectsIa: StateFlow<List<Project>> = _projectsIa
 
     val userId: String? = sessionManager.getUserId()
+    private val _state=MutableStateFlow(AppState())
 
 
     private val _userProfile = MutableStateFlow<GetUserResponse?>(null)
@@ -45,6 +49,14 @@ class HomeViewModel(private val sessionManager: SessionManager)  : ViewModel() {
     val isLoading: StateFlow<Boolean> = _isLoading
     val userProfilel = MutableStateFlow<UserProfileComplet?>(null)
 
+    fun setUser(userProfil: UserProfileFireBase)
+    {
+        _state.update {
+            it.copy(
+                userProfil = userProfil
+            )
+        }
+    }
     // Fetch user profile by email
     fun fetchUserProfile(email: String) {
         viewModelScope.launch {
@@ -57,8 +69,16 @@ class HomeViewModel(private val sessionManager: SessionManager)  : ViewModel() {
                 _userProfile2.value = user // Assign the user to StateFlow
 
                 println("User profile fetched successfully") // Debug log
-                val roleName = RetrofitClient.authService.getRoleName(GetUserIdResponse(user.idUser))
+                val roleName = RetrofitClient.authService.getRoleName(GetUserIdResponse(user.
+                idUser))
                 _role.value = roleName
+                setUser(UserProfileFireBase(
+                    userId = user.idUser,
+                    username = user.username,
+                    email = user.email,
+                    skills = user.skills.toString(),
+                    role = roleName.idRole
+                ))
                 println("Role fetched successfully with name: ${_role.value?.idRole}") // Debug log
 
             } catch (e: Exception) {

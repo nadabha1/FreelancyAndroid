@@ -12,8 +12,10 @@ data class SignupRequest(
 
 data class SignupResponse(
     @Part("msg") val message: String,
-    @Part("email") val username: String,
-    @Part("phone")  val email: String,
+    @Part("username") val username: String,
+    @Part("email")  val email: String,
+    val _id: String,
+
     val password: String,
     val success: Boolean
 )

@@ -59,9 +59,9 @@ class AuthRepository(private val api: UserAPI) {
             val response = RetrofitClient.authService.getUserProfile(email)
             if (response.idUser.isEmpty()) {
                 println("l'id est : "+response.idUser)
-                null // If user ID is missing, treat as invalid
+                null // If user idUser is missing, treat as invalidUser
             } else {
-                println("l'id est : "+response.idUser)
+                println("l'idUser est : "+response.idUser)
                 response
             }
         } catch (e: Exception) {

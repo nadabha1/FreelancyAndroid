@@ -54,7 +54,8 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
         viewModelScope.launch {
             try {
                 if (userId != null) {
-                   val response = RetrofitClient.projetApi.getAllProjectsById(userId)
+                    println("ProjetViewModel $userId")
+                    val response = RetrofitClient.projetApi.getAllProjectsById(userId)
                     _projects.value = response
                 }
                 if (userId == null) {
@@ -67,10 +68,11 @@ class ProjetViewModel(private val sessionManager: SessionManager) : ViewModel() 
     }
     fun fetchProjectByIa() {
         viewModelScope.launch {
+            val Id: String? = sessionManager.getUserId()
             try {
-                if (userId != null) {
-
-                    val response = RetrofitClient.projetApi.getOngoingProjects(userId)
+                if (Id != null) {
+                    println("ProjetViewModel $Id")
+                    val response = RetrofitClient.projetApi.getOngoingProjects(Id)
                     _projectsIa.value = response
 
                 }

@@ -22,8 +22,17 @@ data class UserProfileComplet(
     @SerializedName("country") val country: String? = null,
     @SerializedName("role") val role:String? = null,
     @SerializedName("skills") val skills: String?= null
-
 )
+data class UserProfileFireBase(
+    val userId: String = "",
+    val username: String = "",
+    val email: String = "",
+    val skills: String = "",
+    val role: String = ""
+) {
+    // Constructeur sans argument nécessaire pour Firebase
+    constructor() : this("", "", "", "")
+}
 data class UserProfileCompletRes(
     @SerializedName("_id") val idUser: String,
     @SerializedName("username") val username: String,

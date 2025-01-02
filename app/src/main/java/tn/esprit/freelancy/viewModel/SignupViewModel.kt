@@ -1,9 +1,17 @@
 package tn.esprit.freelancy.viewModel
+import android.content.ContentValues
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import tn.esprit.freelancy.googleSign.USERS_COLLECTION
+import tn.esprit.freelancy.model.chat.UserData
+import tn.esprit.freelancy.model.chat.UserData2
+import tn.esprit.freelancy.model.user.UserProfileComplet
 import tn.esprit.freelancy.repository.AuthRepository
 
 class SignupViewModel(private val authRepository: AuthRepository) : ViewModel() {
@@ -28,6 +36,7 @@ class SignupViewModel(private val authRepository: AuthRepository) : ViewModel() 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    private val userCollection= Firebase.firestore.collection(USERS_COLLECTION)
     // Fonction pour mettre à jour l'email
     fun onEmailChange(newEmail: String) {
         _email.value = newEmail
@@ -46,12 +55,40 @@ class SignupViewModel(private val authRepository: AuthRepository) : ViewModel() 
         _password2.value = newPassword
     }
 
+    fun aadUserToFIreBase(user : UserData){
+        val userDataMap = mapOf(
+            "username" to user?.username,
+            "email" to user?.email,
+            "ppurl" to user?.profilePictureUrl,
+            "userId" to user?.userId
+        )
+        val userDocument = userCollection.document(user.userId)
+        userDocument.get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    userDocument.update(userDataMap)
+                } else {
+                    userDocument.set(userDataMap).addOnSuccessListener {
+                        Log.d(ContentValues.TAG, "User added successfully")
+                    }
+                        .addOnFailureListener { e ->
+                            Log.d(ContentValues.TAG, "Error adding user: $e")
+                        }
+                }
+            }
+    }
 
 
     fun signup(username: String, email: String, password: String) {
         viewModelScope.launch {
             try {
                 val response = authRepository.signup(username, email, "Freelancer",password)
+               /* aadUserToFIreBase(UserData(
+                    userId = "",
+                    username = username,
+                    profilePictureUrl = "",
+                    email = email,
+                ))*/
                 println("Signup successful: $response")
                 _signupSuccess.value = true
             } catch (e: Exception) {

@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.gms.google.services)
+    kotlin("plugin.serialization") version "2.1.0"
 
 }
 
@@ -53,7 +55,7 @@ android {
 dependencies {
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
 
-    implementation("androidx.navigation:navigation-compose:2.5.3")
+    //implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.activity:activity-compose:1.7.2")
@@ -67,6 +69,9 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.androidx.benchmark.common)
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
+    implementation(libs.firebase.firestore)
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -94,7 +99,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
-    implementation ("androidx.navigation:navigation-compose:2.6.0")
+    //implementation ("androidx.navigation:navigation-compose:2.6.0")
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation("io.coil-kt:coil-compose:2.1.0")
@@ -114,6 +119,8 @@ dependencies {
     implementation ("com.google.firebase:firebase-messaging:23.0.0") // For FCM
     implementation ("androidx.compose.runtime:runtime:1.5.0") // Vérifiez la dernière version
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.androidx.navigation.compose.v284)
 
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
 
 }

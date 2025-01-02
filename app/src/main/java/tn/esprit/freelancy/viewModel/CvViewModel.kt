@@ -1,11 +1,15 @@
 package tn.esprit.freelancy.viewModel
 
+import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,6 +18,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import tn.esprit.freelancy.googleSign.USERS_COLLECTION
 import tn.esprit.freelancy.model.user.ApiResponse2
 import tn.esprit.freelancy.model.user.Entity
 import tn.esprit.freelancy.model.user.GetUserIdRequest
@@ -24,6 +29,7 @@ import tn.esprit.freelancy.model.user.UserProfileComplet
 import tn.esprit.freelancy.remote.RetrofitClient
 import tn.esprit.freelancy.repository.AuthRepository
 import tn.esprit.freelancy.repository.CvRepository
+import tn.esprit.freelancy.viewModel.chat.ChatViewModel
 import java.io.File
 
 class CvViewModel(private val repository: CvRepository) : ViewModel() {
@@ -98,20 +104,45 @@ class CvViewModel(private val repository: CvRepository) : ViewModel() {
                 println("Cleaned skills to send: $cleanedSkills")
                 val response = userRepository.updateUserSkills(userId, cleanedSkills)
                 _uiState.value = UiState.Success(response)
+                userProfile.value?.let {
+                    adduserToFirestore(it) }
             } catch (e: Exception) {
                 _uiState.value = UiState.Error(e.message ?: "Failed to update skills")
             }
         }
     }
 
+    private val userCollection = Firebase.firestore.collection(USERS_COLLECTION)
 
+    fun adduserToFirestore(signupRequest: UserProfileComplet){
+        val userDataMap = mapOf(
+            "userId" to signupRequest.idUser,
+            "username" to signupRequest.username,
+            "email" to signupRequest.email,
+            "role" to signupRequest.role,
+            "skills" to signupRequest.skills
+        )
+        val userDocument = userCollection.document(signupRequest.idUser)
+        userDocument.get()
+            .addOnSuccessListener {
+                if (it.exists()) {
+                    userDocument.update(userDataMap)
+                } else {
+                    userDocument.set(userDataMap).addOnSuccessListener {
+                        Log.d(ContentValues.TAG, "User added successfully")
+                    }
+                        .addOnFailureListener { e ->
+                            Log.d(ContentValues.TAG, "Error adding user: $e")
+                        }
+                }
+            }
+    }
 
 
     private val _userProfile = MutableStateFlow<UserProfileComplet?>(null)
     val userProfile: StateFlow<UserProfileComplet?> = _userProfile
     private val _user = MutableStateFlow<GetUserResponsetest?>(null)
     val user: StateFlow<GetUserResponsetest?> = _user
-
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading
     fun fetchUser(username: String) {
@@ -123,12 +154,14 @@ class CvViewModel(private val repository: CvRepository) : ViewModel() {
                 println("User fetched: $user") // Debug log
                 _userProfile.value = user // Assign the user to StateFlow
                 println("User profile fetched successfully $userProfile") // Debug log
+
             } catch (e: Exception) {
                 println("Error fetching user profile: ${e.message}") // Debug log
                 _userProfile.value = null
             }
         }
     }
+
 
 }
 

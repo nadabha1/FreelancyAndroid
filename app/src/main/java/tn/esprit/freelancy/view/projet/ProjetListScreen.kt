@@ -44,6 +44,8 @@ fun ProjetListScreen(
     val projects by viewModel.projects.collectAsState(initial = emptyList())
     var isLoading by remember { mutableStateOf(true) }
     val userEmail by sessionManager.userEmail.collectAsState(initial = null)
+    val userId by sessionManager.userEmail.collectAsState(initial = null)
+
 
     val email = userEmail
     println("Email in ProjetListScreen: $email")
@@ -217,7 +219,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavItem("Projects", Icons.Default.Home, "projects"),
         BottomNavItem("Freelancers", Icons.Default.Person, "ongoing_projects"),
         BottomNavItem("Add Project", Icons.Default.Add, "addProject"),
-        BottomNavItem("Messages", Icons.Default.MailOutline, "messages"),
+        BottomNavItem("Messages", Icons.Default.MailOutline, "chat"),
         BottomNavItem("Alerts", Icons.Default.Notifications, "alerts")
     )
 
